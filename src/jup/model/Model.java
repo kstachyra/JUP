@@ -32,7 +32,7 @@ public class Model
 		
 		if (file.canRead())
 		{
-			JupFile newFile = new JupFile(path, name, file.length(), file.lastModified());
+			JupFile newFile = new JupFile(path, name, file.length());
 			if (!fileList.contains(newFile)) fileList.add(newFile);
 			else System.out.println("Model.addFile: plik istnieje, pomijam dodawanie");
 		}
@@ -50,7 +50,7 @@ public class Model
 		System.out.println("Model.printFileList: obecnie na liscie znajduj¹ siê pliki");
 		for (JupFile el : fileList)
 		{
-		  System.out.println(el.getPath() + el.getName() + "\tstatus: " + el.getStatus() + "\tsum: " + el.getChecksum());
+		  System.out.println("\tstatus: " + el.getStatus() + "\tsum: " + el.getChecksum() + "\t" + el.getPath() + el.getName());
 		}
 	}
 }

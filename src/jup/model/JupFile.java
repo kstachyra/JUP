@@ -9,17 +9,15 @@ public class JupFile
 	private final String name;
 
 	private final long size;
-	private final long lastModified;
 	
 	private long checksum = 0L;
 	private FileStatus status;
 	
-	JupFile(String p, String n, long s, long lm)
+	JupFile(String p, String n, long s)
 	{
 		this.path = p;
 		this.name = n;
 		this.size = s;
-		this.lastModified = lm;
 		this.status = FileStatus.NEW;
 		
 		try
@@ -39,7 +37,6 @@ public class JupFile
         JupFile other = (JupFile) o;
 
         if (this.checksum == other.checksum && this.size == other.size &&
-        	this.lastModified == other.lastModified &&
         	this.path.equals(other.path) && this.name.equals(other.name))
         {
         	return true;
@@ -50,17 +47,12 @@ public class JupFile
 	@Override
     public int hashCode()
 	{
-        return Objects.hash(checksum, size, lastModified, path, name);
+        return Objects.hash(checksum, size, path, name);
     }
 	
 	public Long getSize()
 	{
 		return size;
-	}
-
-	public Long getLastModified()
-	{
-		return lastModified;
 	}
 
 	public Long getChecksum()

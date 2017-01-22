@@ -91,7 +91,7 @@ public class Controller
 	
 	
 	/**
-	 * zape³niamy mapê strategii
+	 * zape³nianie mapê strategii
 	 */
 	private void fillEventStrategyMap()
 	{

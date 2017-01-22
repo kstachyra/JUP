@@ -1,5 +1,6 @@
 package jup.model;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public class JupFile
@@ -10,7 +11,7 @@ public class JupFile
 	private final long size;
 	private final long lastModified;
 	
-	private final long checksum = 0L;
+	private long checksum = 0L;
 	private FileStatus status;
 	
 	JupFile(String p, String n, long s, long lm)
@@ -19,10 +20,15 @@ public class JupFile
 		this.name = n;
 		this.size = s;
 		this.lastModified = lm;
+		this.status = FileStatus.NEW;
 		
-		/**
-		 * TODO checksum + status
-		 */
+		try
+		{
+			this.checksum = Adler.calc(path, name);
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -36,10 +42,8 @@ public class JupFile
         	this.lastModified == other.lastModified &&
         	this.path.equals(other.path) && this.name.equals(other.name))
         {
-        	System.out.println("DUPA");
         	return true;
         }
-        
 		return false;
     }
 	

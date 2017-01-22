@@ -42,12 +42,15 @@ public class Model
 		}
 	}
 
+	/**
+	 * wyœwietla listê plików w konsoli
+	 */
 	public void printFileList()
 	{
-		System.out.println("DFS");
+		System.out.println("Model.printFileList: obecnie na liscie znajduj¹ siê pliki");
 		for (JupFile el : fileList)
 		{
-		  System.out.println(el.getPath() + el.getName() + " size: " + el.getSize());
+		  System.out.println(el.getPath() + el.getName() + "\tstatus: " + el.getStatus() + "\tsum: " + el.getChecksum());
 		}
 	}
 }

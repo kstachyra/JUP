@@ -69,7 +69,7 @@ public class Controller
 		public void runStrategy(final JupEvent event)
 		{
 			AddFileEvent addFileEvent = (AddFileEvent) event;
-			System.out.println("AddFileStrategy");
+			System.out.println("Controller.AddFileStrategy...");
 			
 			
 			model.addFile(addFileEvent.getPath(), addFileEvent.getName());

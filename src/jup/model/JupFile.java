@@ -7,10 +7,10 @@ public class JupFile
 	private final String path;
 	private final String name;
 
-	private final Long size;
-	private final Long lastModified;
+	private final long size;
+	private final long lastModified;
 	
-	private final Long checksum = 0L;
+	private final long checksum = 0L;
 	private FileStatus status;
 	
 	JupFile(String p, String n, long s, long lm)
@@ -31,10 +31,12 @@ public class JupFile
         if (o == this) return true;
         if (!(o instanceof JupFile)) return false;
         JupFile other = (JupFile) o;
+
         if (this.checksum == other.checksum && this.size == other.size &&
         	this.lastModified == other.lastModified &&
-        	this.path == other.path && this.name == other.name)
+        	this.path.equals(other.path) && this.name.equals(other.name))
         {
+        	System.out.println("DUPA");
         	return true;
         }
         

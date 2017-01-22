@@ -33,7 +33,8 @@ public class Model
 		if (file.canRead())
 		{
 			JupFile newFile = new JupFile(path, name, file.length(), file.lastModified());
-			fileList.add(newFile);
+			if (!fileList.contains(newFile)) fileList.add(newFile);
+			else System.out.println("Model.addFile: plik istnieje, pomijam dodawanie");
 		}
 		else
 		{
@@ -46,7 +47,7 @@ public class Model
 		System.out.println("DFS");
 		for (JupFile el : fileList)
 		{
-		  System.out.println(el.getPath() + el.getName() + "size: " + el.getSize());
+		  System.out.println(el.getPath() + el.getName() + " size: " + el.getSize());
 		}
 	}
 }

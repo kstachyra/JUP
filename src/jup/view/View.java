@@ -11,6 +11,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import jup.event.JupEvent;
+import jup.event.PrintFileListEvent;
 import jup.event.AddFileEvent;
 import jup.model.ScreenData;
 import jup.defaults.*;
@@ -56,6 +57,7 @@ public class View
 	
 	private class JupFrame extends JFrame
 	{
+		private static final long serialVersionUID = -7830784355551599029L;
 		private final JScrollPane table;
 		
 		private JupFrame()
@@ -73,21 +75,25 @@ public class View
 			add(table, BorderLayout.CENTER);
 			//add(createInfoPanel(), BorderLayout.LINE_END);
 			
-			JButton button = new JButton("Select File");			
-			button.addActionListener(new ActionListener()
+			ActionListener test2Listener = new ActionListener()
 			{
 				public void actionPerformed(ActionEvent ae)
 				{
-					JFileChooser fileChooser = new JFileChooser();
-					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-					int returnValue = fileChooser.showOpenDialog(null);
-					if (returnValue == JFileChooser.APPROVE_OPTION)
+					try
 					{
-						File selectedFile = fileChooser.getSelectedFile();
-						System.out.println(selectedFile.getAbsolutePath());
+						System.out.println("View: dodaje PrintFileListEvent");
+						blockingQueue.put(new PrintFileListEvent());
+					} catch (Exception ex)
+					{
+						ex.printStackTrace();
+						throw new RuntimeException(ex);
 					}
 				}
-			});
+			};
+			
+			
+			JButton button = new JButton("Select File");			
+			button.addActionListener(test2Listener);
 			
 			button.setPreferredSize(new Dimension(40, 40));
 			add(button, BorderLayout.LINE_END);
@@ -122,15 +128,13 @@ public class View
 						{
 							File selectedFile = fileChooser.getSelectedFile();
 							System.out.println("View: dodaje AddFileEvent(" + selectedFile.getParent() + ", " + selectedFile.getName() + ")");
-						
-						blockingQueue.put(new AddFileEvent(selectedFile.getParent(), selectedFile.getName()));
+							blockingQueue.put(new AddFileEvent(selectedFile.getParent(), selectedFile.getName()));
 						}
 						else
 						{
 							System.out.println("View: b³¹d wybrania pliku, nie dodano eventu");
 						}
-					}
-					catch(Exception ex)
+					} catch(Exception ex)
 					{
 						ex.printStackTrace();
 						throw new RuntimeException(ex);

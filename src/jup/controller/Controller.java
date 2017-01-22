@@ -76,6 +76,18 @@ public class Controller
 		}
 	}
 	
+	/**
+	 * wyœwietlenie listy plików w konsoli
+	 */
+	private final class PrintFileListStrategy extends EventStrategy
+	{
+		public void runStrategy(final JupEvent event)
+		{
+			System.out.println("Controller.PrintFileListStrategy...");
+			model.printFileList();
+		}
+	}
+	
 	
 	
 	/**
@@ -84,5 +96,6 @@ public class Controller
 	private void fillEventStrategyMap()
 	{
 		eventStrategyMap.put(AddFileEvent.class, new AddFileStrategy());
+		eventStrategyMap.put(PrintFileListEvent.class, new PrintFileListStrategy());
 	}
 }

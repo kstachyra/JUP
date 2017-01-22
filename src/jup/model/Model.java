@@ -32,12 +32,21 @@ public class Model
 		
 		if (file.canRead())
 		{
-			
-			fileList.add(new JupFile(path, name, file.length()));
+			JupFile newFile = new JupFile(path, name, file.length(), file.lastModified());
+			fileList.add(newFile);
 		}
 		else
 		{
 			System.out.println("Model.addFile: brak mo¿liwoœci odczytu pliku");
+		}
+	}
+
+	public void printFileList()
+	{
+		System.out.println("DFS");
+		for (JupFile el : fileList)
+		{
+		  System.out.println(el.getPath() + el.getName() + "size: " + el.getSize());
 		}
 	}
 }

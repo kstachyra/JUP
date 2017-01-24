@@ -30,7 +30,7 @@ public class Model
 	    
 	    try
 		{
-			ftpQueue.put(new FtpLoadEvent());
+			ftpQueue.put(new FtpConnectEvent());
 		} catch (Exception ex)
 		{
 			ex.printStackTrace();
@@ -116,7 +116,7 @@ public class Model
 		System.out.println("Model.downloadFile: wstawiam do kolejki FTP ¿¹danie pobrania " + name);
 		try
 		{
-			ftpQueue.put(new FtpLoadEvent());
+			ftpQueue.put(new FtpConnectEvent());
 			changeStatus(path, name, FileStatus.DOWNLOADING);
 		} catch (InterruptedException e)
 		{
@@ -133,7 +133,6 @@ public class Model
 		{
 			if (el.getName().equals(name) && el.getPath().equals(path))
 			{
-				System.out.println("Model.findFile: znaleziono");
 				return el;
 			}
 		}
@@ -141,7 +140,7 @@ public class Model
 	}
 	
 	/**
-	 * zmienia status danego pliku
+	 * zmienia status danego pliku (œcie¿ka + nazwa)
 	 */
 	private void changeStatus(String path, String name, FileStatus status)
 	{

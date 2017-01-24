@@ -1,60 +1,106 @@
 package jup.ftpModel;
 
+import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.swing.SwingUtilities;
-
 import jup.event.JupEvent;
 import jup.event.UpdateEvent;
-import jup.model.ScreenData;
 
 /**
- * kontroler po³¹czenia ftp, przyjmuje zlecenia z kolejki i je wykonuje
+ * system po³¹czenia ftp, przyjmuje zlecenia z kolejki i je wykonuje
  */
 public class FtpModel implements Runnable
 {
+	/** w¹tek obs³ugi sieciowej */
 	public Thread t1;
-	/** kolejka zdarzeñ obs³ugiwanych przezftpController */
+	/** kolejka zdarzeñ obs³ugiwanych przezftpModel */
 	public final BlockingQueue<FtpEvent> ftpQueue  = new LinkedBlockingQueue<FtpEvent>();
 	/** kolejka zdarzeñ przesy³anych do kontrolera */
-	public static BlockingQueue<JupEvent> controllerQueue;
+	public final BlockingQueue<JupEvent> controllerQueue;
+	
+	/**mapa t³umacz¹ca FtpEvent -> EventStrategy
+	 * co robimy (jak¹ strategiê) w zale¿noœci od tego, jakie zdarzenie otrzymamy */
+	private final HashMap<Class<? extends FtpEvent>, EventStrategy> eventStrategyMap;
 	
 	public FtpModel (final BlockingQueue<JupEvent> controllerQueue)
 	{
 		this.controllerQueue = controllerQueue;
+		eventStrategyMap = new HashMap<Class<? extends FtpEvent>, EventStrategy>();
+		fillEventStrategyMap();
 	}
-		
+
+	/**
+	 * abstrakcyjna klasa strategii dla eventu
+	 */
+	private abstract class EventStrategy
+	{
+		abstract public void runStrategy(final FtpEvent event) throws InterruptedException;
+	}
+	
+	/**
+	 * strategia dla ³¹czenia z serwerem ftp
+	 */
+	private class ConnectStrategy extends EventStrategy
+	{
+		@Override
+		public void runStrategy(FtpEvent event) throws InterruptedException
+		{
+			System.out.println("FTP.ConnectStrategy...");
+			Thread.sleep(5000);
+		}
+	}
+	
+	/**
+	 * strategia dla wysy³ania pliku
+	 */
+	private class UploadStrategy extends EventStrategy
+	{
+		@Override
+		public void runStrategy(FtpEvent event) throws InterruptedException
+		{
+			System.out.println("FTP.UploadStrategy...");
+			Thread.sleep(5000);
+		}
+	}
+	
+	/**
+	 * strategia dla pobierania pliku
+	 */
+	private class DownloadStrategy extends EventStrategy
+	{
+		@Override
+		public void runStrategy(FtpEvent event) throws InterruptedException
+		{
+			System.out.println("FTP.DownloadStrategy...");
+			Thread.sleep(5000);
+		}
+	}
+	
+	/**
+	 * zape³nianie mapy strategii
+	 */
+	private void fillEventStrategyMap()
+	{
+		eventStrategyMap.put(FtpUploadEvent.class, new UploadStrategy());
+		eventStrategyMap.put(FtpDownloadEvent.class, new DownloadStrategy());
+		eventStrategyMap.put(FtpConnectEvent.class, new ConnectStrategy());
+	}
+	
+	/**
+	 * uruchamianie w¹tku obs³uguj¹cego zdarzenia w pêtli
+	 */
 	@Override
 	public void run()
-	{
-		/*for(int i = 4; i > 0; i--)
-		{
-            System.out.println("Thread: " + ", " + i);
-            // Let the thread sleep for a while.
-            try
-			{
-				Thread.sleep(5000);
-			} catch (InterruptedException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        }*/
-		
+	{	
 		while(true)
 		{
 			try
 			{
 				FtpEvent event = ftpQueue.take();
-				//EventStrategy eventStrategy = eventStrategyMap.get(event.getClass());
-				//eventStrategy.runStrategy(event);
-				//view.refresh(model.getScreenData());
-				
-				System.out.println("FTP: obs³uguje ftpevent");
-				Thread.sleep(5);
+				EventStrategy eventStrategy = eventStrategyMap.get(event.getClass());
+				eventStrategy.runStrategy(event);
 				controllerQueue.put(new UpdateEvent());
-				System.out.println("FTP: obs³u¿y³em ftpevent");
 			}
 			catch(Exception e)
 			{
@@ -62,8 +108,7 @@ public class FtpModel implements Runnable
 				throw new RuntimeException(e);
 			}
 		}
-		
-	//System.out.println("FTP: koñczê pracê w¹tku");
+	//TODO koñczenie            System.out.println("FTP: koñczê pracê w¹tku");
 	}
 	
 	public void start()

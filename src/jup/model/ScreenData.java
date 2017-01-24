@@ -7,10 +7,10 @@ public class ScreenData
 	public List<JupFile> tableData;
 	public JupStatus status;
 	
-	public ScreenData(List<JupFile> list)
+	public ScreenData(List<JupFile> list, JupStatus status)
 	{
 		tableData = list;
-		status = JupStatus.LOADING;
+		this.status = status;
 	}
 	
 	public String getStatusText()

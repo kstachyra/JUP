@@ -8,14 +8,16 @@ public class Model
 {
 	/** lista wybranych plików */
 	private List <JupFile> fileList = new ArrayList<JupFile>();
+	
+	/** status programu */
+	private JupStatus status = JupStatus.DWA;
 
 	/**
 	 * metoda zwracaj¹ca dane do wyœwietlenia dla widoku
 	 */
 	public ScreenData getScreenData()
 	{
-		ScreenData sd = new ScreenData(fileList);
-
+		ScreenData sd = new ScreenData(fileList, status);
 		return sd;
 	}
 

@@ -4,10 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.concurrent.BlockingQueue;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import jup.event.JupEvent;
@@ -29,8 +33,6 @@ public class View
 	
 	/** dane wyœwietlane w tabeli plików */
 	private DefaultTableModel tableModel = new DefaultTableModel(JupDefaults.COLUMN_NAMES, 0);
-	/** szczegó³y zaznaczonego pliku*/
-	/** TODO ?? */
 	
 	public View(final BlockingQueue<JupEvent> bq, final ScreenData sd)
 	{
@@ -194,6 +196,19 @@ public class View
 			JTable table = new JTable(tableModel);
 			JScrollPane scrollPane = new JScrollPane(table);
 			table.setFillsViewportHeight(true);
+			
+			table.addMouseListener(new MouseAdapter()
+			{
+			    public void mouseClicked(MouseEvent evnt)
+			    {
+			        if (evnt.getClickCount() == 1)
+			        {
+			        	/** TODO wybór lokalizacji do pobrania pliku, pobieranie isdfps */
+			        	System.out.println(table.getValueAt(table.getSelectedRow(), 0).toString());
+			        }
+			     }
+			});
+			
 			return scrollPane;
 		}
 		

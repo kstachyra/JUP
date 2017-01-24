@@ -22,6 +22,8 @@ public class View
 {
 	/** okno programu */
 	private JupFrame frame;
+	/** pasek statusu programu*/
+	private JLabel statusLabel;
 	/** kolejka zdarzeñ przesy³anych z widoku do kontrolera */
 	private static BlockingQueue<JupEvent> blockingQueue;
 	
@@ -52,6 +54,7 @@ public class View
 			public void run()
 			{
 				frame.drawTable(sd);
+				frame.updateStatus(sd);
 			}
 		});
 	}
@@ -69,7 +72,7 @@ public class View
 			
 			setJMenuBar(createMenu());
 			
-			add(createToolbar(), BorderLayout.PAGE_START);
+			//add(createToolbar(), BorderLayout.PAGE_START);
 			
 			table = createTable();
 			
@@ -99,7 +102,8 @@ public class View
 			button.setPreferredSize(new Dimension(40, 40));
 			add(button, BorderLayout.LINE_END);
 			
-			
+			statusLabel = createStatusLabel();
+			add(statusLabel, BorderLayout.PAGE_END);
 			
 			
 			pack();
@@ -107,7 +111,7 @@ public class View
 			//setResizable(false);
 			setVisible(true);	
 		}
-		
+
 		private void drawTable(ScreenData sd)
 		{
 			//usuwam istniej¹ce wiersze
@@ -124,6 +128,11 @@ public class View
 			{
 				tableModel.addRow(new Object[]{el.getName(), el.getPath(), el.getStatus(), el.getChecksum(), el.getSize()});
 			}
+		}
+		
+		private void updateStatus(ScreenData sd)
+		{
+			statusLabel.setText(sd.getStatusText());
 		}
 
 		private final JMenuBar createMenu()
@@ -186,6 +195,14 @@ public class View
 			JScrollPane scrollPane = new JScrollPane(table);
 			table.setFillsViewportHeight(true);
 			return scrollPane;
+		}
+		
+		private JLabel createStatusLabel()
+		{
+			JLabel label = new JLabel("program status");
+			label.setHorizontalTextPosition(JLabel.LEFT);
+			
+			return label;
 		}
 	}
 }

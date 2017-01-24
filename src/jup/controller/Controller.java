@@ -88,6 +88,17 @@ public class Controller
 		}
 	}
 	
+	/**
+	 * pobieranie pliku z serwera
+	 */
+	private final class DownloadFileStrategy extends EventStrategy
+	{
+		public void runStrategy(final JupEvent event)
+		{
+			System.out.println("Controller.DownloadFileStrategy...");
+			////////////////////////////////////////////////////////////////model.printFileList();
+		}
+	}
 	
 	
 	/**
@@ -97,5 +108,6 @@ public class Controller
 	{
 		eventStrategyMap.put(AddFileEvent.class, new AddFileStrategy());
 		eventStrategyMap.put(PrintFileListEvent.class, new PrintFileListStrategy());
+		eventStrategyMap.put(DownloadFileEvent.class, new DownloadFileStrategy());
 	}
 }

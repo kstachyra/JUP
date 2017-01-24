@@ -64,7 +64,7 @@ public class Model
 	}
 	
 	/**
-	 * zwraca element listy plików o podanej œcie¿ce
+	 * zwraca element listy plików pliku o podanej œcie¿ce
 	 */
 	private JupFile findFile(String path, String name)
 	{
@@ -82,7 +82,7 @@ public class Model
 	}
 	
 	/**
-	 * zwraca element listy plików o podanej œcie¿ce
+	 * zmienia status danego pliku
 	 */
 	private void changeStatus(String path, String name, FileStatus status)
 	{

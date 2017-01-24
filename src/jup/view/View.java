@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.concurrent.BlockingQueue;
 
@@ -14,9 +16,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-import jup.event.JupEvent;
-import jup.event.PrintFileListEvent;
-import jup.event.AddFileEvent;
+import jup.event.*;
 import jup.model.JupFile;
 import jup.model.ScreenData;
 import jup.defaults.*;
@@ -97,6 +97,21 @@ public class View
 				}
 			};
 			
+			/** obs³uga zamykania programu poprzez naciœniêcie X */
+			this.addWindowListener(new WindowAdapter()
+			{
+			    @Override
+			    public void windowClosing(WindowEvent e)
+			    {
+			        System.out.println("ZAMYKAM...");
+			    }
+			});
+			
+			pack();
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			//setResizable(false);
+			setVisible(true);	
+			
 			
 			JButton button = new JButton("Select File");			
 			button.addActionListener(test2Listener);
@@ -106,13 +121,9 @@ public class View
 			
 			statusLabel = createStatusLabel();
 			add(statusLabel, BorderLayout.PAGE_END);
-			
-			
-			pack();
-			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			//setResizable(false);
-			setVisible(true);	
 		}
+		
+		
 
 		private void drawTable(ScreenData sd)
 		{
@@ -203,8 +214,30 @@ public class View
 			    {
 			        if (evnt.getClickCount() == 1)
 			        {
-			        	/** TODO wybór lokalizacji do pobrania pliku, pobieranie isdfps */
-			        	System.out.println(table.getValueAt(table.getSelectedRow(), 0).toString());
+						try
+						{
+							// okno wyboru pliku
+							JFileChooser fileChooser = new JFileChooser();
+							fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+							int returnValue = fileChooser.showOpenDialog(null);
+							if (returnValue == JFileChooser.APPROVE_OPTION)
+							{
+								File selectedDir = fileChooser.getSelectedFile();
+								System.out.println("View: dodaje DownloadFileEvent " + selectedDir.getPath() + "dla " + table.getValueAt(table.getSelectedRow(), 0));
+								blockingQueue.put(new DownloadFileEvent(table.getValueAt(table.getSelectedRow(), 0).toString(), table.getValueAt(table.getSelectedRow(), 1).toString(), selectedDir.getPath()));
+								System.out.println("!_!_!_!_!" +   selectedDir.getPath());
+							}
+							else
+							{
+								System.out.println("View: b³¹d wybrania folderu zapisu, nie dodano eventu");
+							}
+						} catch(Exception ex)
+						{
+							ex.printStackTrace();
+							throw new RuntimeException(ex);
+						}	
+						
+			        	//System.out.println(table.getValueAt(table.getSelectedRow(), 0).toString());
 			        }
 			     }
 			});

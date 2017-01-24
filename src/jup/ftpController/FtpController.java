@@ -37,14 +37,16 @@ public class FtpController implements Runnable
 				//EventStrategy eventStrategy = eventStrategyMap.get(event.getClass());
 				//eventStrategy.runStrategy(event);
 				//view.refresh(model.getScreenData());
+				
+				System.out.println("FTP: obs³uguje ftpevent");
+				Thread.sleep(5000);
+				System.out.println("FTP: obs³u¿y³em ftpevent");
 			}
 			catch(Exception e)
 			{
 				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
-			
-			System.out.println("FTP: obs³uguje ftpevent");
 		}
 		
 	//System.out.println("FTP: koñczê pracê w¹tku");

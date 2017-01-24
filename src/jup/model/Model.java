@@ -131,4 +131,16 @@ public class Model
 		System.out.println("Model.exit: koñczê pracê");
 		//TODO poczekaj na w¹tki...
 	}
+
+	public void downloadFile(String path, String name, String dir)
+	{
+		System.out.println("Model.downloadFile: wstawiam do kolejki FTP ¿¹danie pobrania " + name);
+		try
+		{
+			ftpQueue.put(new FtpLoadEvent());
+		} catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+	}
 }

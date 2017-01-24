@@ -6,6 +6,7 @@ import java.util.concurrent.BlockingQueue;
 import jup.model.Model;
 import jup.view.View;
 import jup.event.*;
+import jup.ftpController.FtpController;
 
 public class Controller
 {
@@ -107,8 +108,9 @@ public class Controller
 	{
 		public void runStrategy(final JupEvent event)
 		{
+			DownloadFileEvent downloadFileEvent = (DownloadFileEvent) event;
 			System.out.println("Controller.DownloadFileStrategy...");
-			////////////////////////////////////////////////////////////////model.printFileList();
+			model.downloadFile(downloadFileEvent.getPath(), downloadFileEvent.getName(), downloadFileEvent.getDir());
 		}
 	}
 	

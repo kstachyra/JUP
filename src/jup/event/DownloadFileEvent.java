@@ -13,4 +13,19 @@ public class DownloadFileEvent extends JupEvent
 		this.name = name;
 		this.dir = dir;
 	}
+	
+	public String getPath()
+	{
+		return path;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public String getDir()
+	{
+		return dir;
+	}
 }

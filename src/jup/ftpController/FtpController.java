@@ -15,7 +15,7 @@ public class FtpController implements Runnable
 	@Override
 	public void run()
 	{
-		for(int i = 4; i > 0; i--)
+		/*for(int i = 4; i > 0; i--)
 		{
             System.out.println("Thread: " + ", " + i);
             // Let the thread sleep for a while.
@@ -27,8 +27,9 @@ public class FtpController implements Runnable
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-        }
-		/*while(true)
+        }*/
+		
+		while(true)
 		{
 			try
 			{
@@ -42,10 +43,11 @@ public class FtpController implements Runnable
 				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
+			
+			System.out.println("FTP: obs³uguje ftpevent");
 		}
-	}*/
 		
-	System.out.println("FTP: koñczê pracê w¹tku");
+	//System.out.println("FTP: koñczê pracê w¹tku");
 	}
 	
 	public void start()

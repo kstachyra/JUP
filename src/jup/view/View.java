@@ -219,7 +219,7 @@ public class View
 			{
 			    public void mouseClicked(MouseEvent evnt)
 			    {
-			        if (evnt.getClickCount() == 1)
+			        if (evnt.getClickCount() == 1 && table.getSelectedRow() >= 0)
 			        {
 						try
 						{
@@ -231,7 +231,7 @@ public class View
 							{
 								File selectedDir = fileChooser.getSelectedFile();
 								System.out.println("View: dodaje DownloadFileEvent " + selectedDir.getPath() + " dla " + table.getValueAt(table.getSelectedRow(), 0));
-								blockingQueue.put(new DownloadFileEvent(table.getValueAt(table.getSelectedRow(), 0).toString(), table.getValueAt(table.getSelectedRow(), 1).toString(), selectedDir.getPath()));
+								blockingQueue.put(new DownloadFileEvent(table.getValueAt(table.getSelectedRow(), 1).toString(), table.getValueAt(table.getSelectedRow(), 0).toString(), selectedDir.getPath()));
 							}
 							else
 							{

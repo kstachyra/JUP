@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
+import jup.event.DownloadFileEvent;
 import jup.ftpController.FtpController;
 import jup.ftpController.FtpEvent;
+import jup.ftpController.FtpLoadEvent;
 
 public class Model
 {
@@ -16,7 +18,10 @@ public class Model
 	/** status programu */
 	private JupStatus status;
 	
-	/** kolejka ftp */
+	/** ftp controller */
+	FtpController ftp = new FtpController();
+	
+	/** kolejka zdarzeñ ftp */
 	private BlockingQueue<FtpEvent> ftpQueue;
 
 	/**
@@ -25,9 +30,16 @@ public class Model
 	public Model()
 	{
 		status = JupStatus.START;
-		FtpController ftp = new FtpController();
-	    ftp.run();
+	    ftp.start();
 	    ftpQueue = ftp.blockingQueue;
+	    
+	    try
+		{
+			ftpQueue.put(new FtpLoadEvent());
+		} catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}
 		//TODO run w¹tki, pobierz info o plikach, zmien status oswie¿ widok...
 	    //a jak nie to error koniec kaput
 	}
@@ -108,5 +120,15 @@ public class Model
 	{
 		System.out.println("Model.changeStatus: zmieniam status pliku na " + status);
 		findFile(path, name).setStatus(status);
+	}
+	
+	/**
+	 * koñczy pracê programu
+	 */
+
+	public void exit()
+	{
+		System.out.println("Model.exit: koñczê pracê");
+		//TODO poczekaj na w¹tki...
 	}
 }

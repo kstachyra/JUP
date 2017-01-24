@@ -103,7 +103,6 @@ public class View
 			    @Override
 			    public void windowClosing(WindowEvent e)
 			    {
-			        System.out.println("ZAMYKAM...");
 					try
 					{
 						blockingQueue.put(new ExitEvent());
@@ -158,7 +157,7 @@ public class View
 
 		private final JMenuBar createMenu()
 		{
-			ActionListener testListener = new ActionListener()
+			ActionListener addListener = new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
@@ -188,7 +187,7 @@ public class View
 			
 			JMenu fileMenu = new JMenu("File");
 			JMenuItem addMenuItem = new JMenuItem("Add");
-			addMenuItem.addActionListener(testListener);
+			addMenuItem.addActionListener(addListener);
 			
 			fileMenu.add(addMenuItem);
 			
@@ -231,9 +230,8 @@ public class View
 							if (returnValue == JFileChooser.APPROVE_OPTION)
 							{
 								File selectedDir = fileChooser.getSelectedFile();
-								System.out.println("View: dodaje DownloadFileEvent " + selectedDir.getPath() + "dla " + table.getValueAt(table.getSelectedRow(), 0));
+								System.out.println("View: dodaje DownloadFileEvent " + selectedDir.getPath() + " dla " + table.getValueAt(table.getSelectedRow(), 0));
 								blockingQueue.put(new DownloadFileEvent(table.getValueAt(table.getSelectedRow(), 0).toString(), table.getValueAt(table.getSelectedRow(), 1).toString(), selectedDir.getPath()));
-								System.out.println("!_!_!_!_!" +   selectedDir.getPath());
 							}
 							else
 							{
@@ -244,8 +242,6 @@ public class View
 							ex.printStackTrace();
 							throw new RuntimeException(ex);
 						}	
-						
-			        	//System.out.println(table.getValueAt(table.getSelectedRow(), 0).toString());
 			        }
 			     }
 			});

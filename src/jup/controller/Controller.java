@@ -84,6 +84,7 @@ public class Controller
 		public void runStrategy(final JupEvent event)
 		{
 			System.out.println("Controller.ExitStrategy...");
+			model.exit();
 		}
 	}
 	

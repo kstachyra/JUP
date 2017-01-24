@@ -14,9 +14,7 @@ public class Model
 	 */
 	public ScreenData getScreenData()
 	{
-		ScreenData sd = new ScreenData();
-		Object[][] k = {{"a", "b", 0}};
-		sd.tableData = k;
+		ScreenData sd = new ScreenData(fileList);
 
 		return sd;
 	}

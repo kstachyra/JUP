@@ -1,6 +1,13 @@
 package jup.model;
 
+import java.util.List;
+
 public class ScreenData
 {
-	public Object[][] tableData;
+	public List<JupFile> tableData;
+	
+	public ScreenData(List<JupFile> list)
+	{
+		tableData = list;
+	}
 }

@@ -13,6 +13,7 @@ import javax.swing.table.DefaultTableModel;
 import jup.event.JupEvent;
 import jup.event.PrintFileListEvent;
 import jup.event.AddFileEvent;
+import jup.model.JupFile;
 import jup.model.ScreenData;
 import jup.defaults.*;
 
@@ -109,7 +110,20 @@ public class View
 		
 		private void drawTable(ScreenData sd)
 		{
-			tableModel.addRow(sd.tableData);
+			//usuwam istniej¹ce wiersze
+			if (tableModel.getRowCount() > 0)
+			{
+			    for (int i = tableModel.getRowCount() - 1; i > -1; i--)
+			    {
+			    	tableModel.removeRow(i);
+			    }
+			}
+			
+			//uzupe³niam o aktualne wiersze tabelê JTable
+			for (JupFile el : sd.tableData)
+			{
+				tableModel.addRow(new Object[]{el.getName(), el.getPath(), el.getStatus(), el.getChecksum(), el.getSize()});
+			}
 		}
 
 		private final JMenuBar createMenu()

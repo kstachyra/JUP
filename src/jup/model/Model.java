@@ -3,6 +3,10 @@ package jup.model;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+
+import jup.ftpController.FtpController;
+import jup.ftpController.FtpEvent;
 
 public class Model
 {
@@ -10,7 +14,23 @@ public class Model
 	private List <JupFile> fileList = new ArrayList<JupFile>();
 	
 	/** status programu */
-	private JupStatus status = JupStatus.DWA;
+	private JupStatus status;
+	
+	/** kolejka ftp */
+	private BlockingQueue<FtpEvent> ftpQueue;
+
+	/**
+	 * tworzenie modelu, uruchomienie w¹tków ftp, ustawienie statusu programu
+	 */
+	public Model()
+	{
+		status = JupStatus.START;
+		FtpController ftp = new FtpController();
+	    ftp.run();
+	    ftpQueue = ftp.blockingQueue;
+		//TODO run w¹tki, pobierz info o plikach, zmien status oswie¿ widok...
+	    //a jak nie to error koniec kaput
+	}
 
 	/**
 	 * metoda zwracaj¹ca dane do wyœwietlenia dla widoku

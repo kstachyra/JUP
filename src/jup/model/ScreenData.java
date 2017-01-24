@@ -18,7 +18,7 @@ public class ScreenData
 		switch (status)
 		{
 		case JEDEN: return "pierwszy status";
-		case DWA: return "drugi status";
+		case START: return "starting";
 		case LOADING: return "loading";
 			
 		default: return "error status";

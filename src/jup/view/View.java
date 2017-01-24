@@ -104,6 +104,14 @@ public class View
 			    public void windowClosing(WindowEvent e)
 			    {
 			        System.out.println("ZAMYKAM...");
+					try
+					{
+						blockingQueue.put(new ExitEvent());
+					} catch (Exception ex)
+					{
+						ex.printStackTrace();
+						throw new RuntimeException(ex);
+					}
 			    }
 			});
 			

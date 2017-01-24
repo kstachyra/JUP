@@ -2,5 +2,5 @@ package jup.model;
 
 public enum JupStatus
 {
-	JEDEN, DWA, LOADING;
+	JEDEN, START, LOADING;
 }

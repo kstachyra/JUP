@@ -77,6 +77,17 @@ public class Controller
 	}
 	
 	/**
+	 * wy³¹czanie programu, sprz¹tanie
+	 */
+	private final class ExitStrategy extends EventStrategy
+	{
+		public void runStrategy(final JupEvent event)
+		{
+			System.out.println("Controller.ExitStrategy...");
+		}
+	}
+	
+	/**
 	 * wyœwietlenie listy plików w konsoli
 	 */
 	private final class PrintFileListStrategy extends EventStrategy
@@ -100,7 +111,6 @@ public class Controller
 		}
 	}
 	
-	
 	/**
 	 * zape³nianie mapê strategii
 	 */
@@ -109,5 +119,6 @@ public class Controller
 		eventStrategyMap.put(AddFileEvent.class, new AddFileStrategy());
 		eventStrategyMap.put(PrintFileListEvent.class, new PrintFileListStrategy());
 		eventStrategyMap.put(DownloadFileEvent.class, new DownloadFileStrategy());
+		eventStrategyMap.put(ExitEvent.class, new ExitStrategy());
 	}
 }

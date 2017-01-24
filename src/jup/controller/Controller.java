@@ -6,7 +6,7 @@ import java.util.concurrent.BlockingQueue;
 import jup.model.Model;
 import jup.view.View;
 import jup.event.*;
-import jup.ftpController.FtpController;
+import jup.ftpModel.FtpModel;
 
 public class Controller
 {
@@ -14,7 +14,7 @@ public class Controller
 	private final Model model;
 	private final BlockingQueue<JupEvent> bq;
 	
-	private final FtpController ftp;
+	private final FtpModel ftp;
 	
 	/**mapa t³umacz¹ca JupEvent -> EventStrategy
 	 * co robimy (jak¹ strategiê) w zale¿noœci od tego, jakie zdarzenie otrzymamy */
@@ -23,7 +23,7 @@ public class Controller
 	/**
 	 * konstruktor kontrolera, tworzy i zape³nia mapê strategii
 	 */
-	public Controller(final View view, final Model model, final BlockingQueue<JupEvent> blockingQueue, final FtpController ftp)
+	public Controller(final View view, final Model model, final BlockingQueue<JupEvent> blockingQueue, final FtpModel ftp)
 	{
 		this.view = view;
 		this.model = model;

@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-import jup.ftpController.FtpController;
-import jup.ftpController.FtpEvent;
-import jup.ftpController.FtpLoadEvent;
+import jup.ftpModel.*;
 
 public class Model
 {
@@ -24,7 +22,7 @@ public class Model
 	/**
 	 * tworzenie modelu, uruchomienie w¹tków ftp, ustawienie statusu programu
 	 */
-	public Model(FtpController ftp)
+	public Model(FtpModel ftp)
 	{
 		status = JupStatus.START;
 	    ftp.start();
@@ -85,17 +83,26 @@ public class Model
 	 */
 	public void update()
 	{
-		System.out.println("Model.update: porównujê lokaln¹ listê plików z informacjami pobranymi z serwera");
+		System.out.println("Model.update: ...");
 		for (JupFile el : fileList)
 		{
-			//TODO !!!
+			if (el.getStatus() == FileStatus.NEW  || el.getStatus() == FileStatus.EDITED)
+			{
+				System.out.println("Model.update: dodajê do kolejki ftp ¿¹danie wys³ania pliku na serwer" + el.getName());
+				try
+				{
+					ftpQueue.put(new FtpUploadEvent(el.getName(), el.getPath()));
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	
 	/**
 	 * koñczy pracê programu
 	 */
-
 	public void exit()
 	{
 		System.out.println("Model.exit: koñczê pracê");
@@ -111,21 +118,18 @@ public class Model
 		try
 		{
 			ftpQueue.put(new FtpLoadEvent());
+			changeStatus(path, name, FileStatus.DOWNLOADING);
 		} catch (InterruptedException e)
 		{
 			e.printStackTrace();
 		}
 	}
 
-	
-	
-	
 	/**
 	 * zwraca element listy plików pliku o podanej œcie¿ce
 	 */
 	private JupFile findFile(String path, String name)
 	{
-		System.out.println("Model.findFile: szukam na liœcie plików pliku o podanej œcie¿ce" + path + "\\" + name);
 		for (JupFile el : fileList)
 		{
 			if (el.getName().equals(name) && el.getPath().equals(path))
@@ -134,7 +138,6 @@ public class Model
 				return el;
 			}
 		}
-		System.out.println("Model.findFile: nie znaleziono");
 		return null;
 	}
 	

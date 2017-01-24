@@ -3,15 +3,28 @@ package jup.ftpController;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import javax.swing.SwingUtilities;
+
+import jup.event.JupEvent;
+import jup.event.UpdateEvent;
+import jup.model.ScreenData;
+
 /**
  * kontroler po³¹czenia ftp, przyjmuje zlecenia z kolejki i je wykonuje
  */
 public class FtpController implements Runnable
 {
 	public Thread t1;
-	public final BlockingQueue<FtpEvent> blockingQueue  = new LinkedBlockingQueue<FtpEvent>();
+	/** kolejka zdarzeñ obs³ugiwanych przezftpController */
+	public final BlockingQueue<FtpEvent> ftpQueue  = new LinkedBlockingQueue<FtpEvent>();
+	/** kolejka zdarzeñ przesy³anych do kontrolera */
+	public static BlockingQueue<JupEvent> controllerQueue;
 	
-	
+	public FtpController (final BlockingQueue<JupEvent> controllerQueue)
+	{
+		this.controllerQueue = controllerQueue;
+	}
+		
 	@Override
 	public void run()
 	{
@@ -33,13 +46,14 @@ public class FtpController implements Runnable
 		{
 			try
 			{
-				FtpEvent event = blockingQueue.take();
+				FtpEvent event = ftpQueue.take();
 				//EventStrategy eventStrategy = eventStrategyMap.get(event.getClass());
 				//eventStrategy.runStrategy(event);
 				//view.refresh(model.getScreenData());
 				
 				System.out.println("FTP: obs³uguje ftpevent");
 				Thread.sleep(5000);
+				controllerQueue.put(new UpdateEvent());
 				System.out.println("FTP: obs³u¿y³em ftpevent");
 			}
 			catch(Exception e)

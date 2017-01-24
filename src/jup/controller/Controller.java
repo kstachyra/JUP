@@ -14,6 +14,8 @@ public class Controller
 	private final Model model;
 	private final BlockingQueue<JupEvent> bq;
 	
+	private final FtpController ftp;
+	
 	/**mapa t³umacz¹ca JupEvent -> EventStrategy
 	 * co robimy (jak¹ strategiê) w zale¿noœci od tego, jakie zdarzenie otrzymamy */
 	private final HashMap<Class<? extends JupEvent>, EventStrategy> eventStrategyMap;
@@ -21,11 +23,13 @@ public class Controller
 	/**
 	 * konstruktor kontrolera, tworzy i zape³nia mapê strategii
 	 */
-	public Controller(final View view, final Model model, final BlockingQueue<JupEvent> blockingQueue)
+	public Controller(final View view, final Model model, final BlockingQueue<JupEvent> blockingQueue, final FtpController ftp)
 	{
 		this.view = view;
 		this.model = model;
 		this.bq = blockingQueue;
+		
+		this.ftp = ftp;
 		
 		eventStrategyMap = new HashMap<Class<? extends JupEvent>, EventStrategy>();
 		fillEventStrategyMap();
@@ -92,12 +96,12 @@ public class Controller
 	/**
 	 * wyœwietlenie listy plików w konsoli
 	 */
-	private final class PrintFileListStrategy extends EventStrategy
+	private final class UpdateStrategy extends EventStrategy
 	{
 		public void runStrategy(final JupEvent event)
 		{
-			System.out.println("Controller.PrintFileListStrategy...");
-			model.printFileList();
+			System.out.println("Controller.UpdateStrategy...");
+			model.update();
 		}
 	}
 	
@@ -120,7 +124,7 @@ public class Controller
 	private void fillEventStrategyMap()
 	{
 		eventStrategyMap.put(AddFileEvent.class, new AddFileStrategy());
-		eventStrategyMap.put(PrintFileListEvent.class, new PrintFileListStrategy());
+		eventStrategyMap.put(UpdateEvent.class, new UpdateStrategy());
 		eventStrategyMap.put(DownloadFileEvent.class, new DownloadFileStrategy());
 		eventStrategyMap.put(ExitEvent.class, new ExitStrategy());
 	}

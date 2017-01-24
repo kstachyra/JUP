@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-import jup.event.DownloadFileEvent;
 import jup.ftpController.FtpController;
 import jup.ftpController.FtpEvent;
 import jup.ftpController.FtpLoadEvent;
@@ -18,20 +17,18 @@ public class Model
 	/** status programu */
 	private JupStatus status;
 	
-	/** ftp controller */
-	FtpController ftp = new FtpController();
-	
 	/** kolejka zdarzeñ ftp */
 	private BlockingQueue<FtpEvent> ftpQueue;
+	
 
 	/**
 	 * tworzenie modelu, uruchomienie w¹tków ftp, ustawienie statusu programu
 	 */
-	public Model()
+	public Model(FtpController ftp)
 	{
 		status = JupStatus.START;
 	    ftp.start();
-	    ftpQueue = ftp.blockingQueue;
+	    ftpQueue = ftp.ftpQueue;
 	    
 	    try
 		{
@@ -84,16 +81,44 @@ public class Model
 	}
 
 	/**
-	 * wyœwietla listê plików w konsoli
+	 * synchronizuje informacje miêdzy serwerem a klientem
 	 */
-	public void printFileList()
+	public void update()
 	{
-		System.out.println("Model.printFileList: obecnie na liscie znajduj¹ siê pliki");
+		System.out.println("Model.update: porównujê lokaln¹ listê plików z informacjami pobranymi z serwera");
 		for (JupFile el : fileList)
 		{
-		  System.out.println("\tstatus: " + el.getStatus() + "\tsum: " + el.getChecksum() + "\t" + el.getPath() +"\\" + el.getName());
+			//TODO !!!
 		}
 	}
+	
+	/**
+	 * koñczy pracê programu
+	 */
+
+	public void exit()
+	{
+		System.out.println("Model.exit: koñczê pracê");
+		//TODO poczekaj na w¹tki...
+	}
+
+	/**
+	 * przekazuje do kolejki ftp zdarzenie pobrania pliku
+	 */
+	public void downloadFile(String path, String name, String dir)
+	{
+		System.out.println("Model.downloadFile: wstawiam do kolejki FTP ¿¹danie pobrania " + name);
+		try
+		{
+			ftpQueue.put(new FtpLoadEvent());
+		} catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	
+	
 	
 	/**
 	 * zwraca element listy plików pliku o podanej œcie¿ce
@@ -122,25 +147,4 @@ public class Model
 		findFile(path, name).setStatus(status);
 	}
 	
-	/**
-	 * koñczy pracê programu
-	 */
-
-	public void exit()
-	{
-		System.out.println("Model.exit: koñczê pracê");
-		//TODO poczekaj na w¹tki...
-	}
-
-	public void downloadFile(String path, String name, String dir)
-	{
-		System.out.println("Model.downloadFile: wstawiam do kolejki FTP ¿¹danie pobrania " + name);
-		try
-		{
-			ftpQueue.put(new FtpLoadEvent());
-		} catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
-	}
 }

@@ -28,7 +28,7 @@ public class View
 	private JupFrame frame;
 	/** pasek statusu programu*/
 	private JLabel statusLabel;
-	/** kolejka zdarzeñ przesy³anych z widoku do kontrolera */
+	/** kolejka zdarzeñ przesy³anych do kontrolera */
 	private static BlockingQueue<JupEvent> blockingQueue;
 	
 	/** dane wyœwietlane w tabeli plików */
@@ -81,14 +81,14 @@ public class View
 			add(table, BorderLayout.CENTER);
 			//add(createInfoPanel(), BorderLayout.LINE_END);
 			
-			ActionListener test2Listener = new ActionListener()
+			ActionListener updateButtonListener = new ActionListener()
 			{
 				public void actionPerformed(ActionEvent ae)
 				{
 					try
 					{
-						System.out.println("View: dodaje PrintFileListEvent");
-						blockingQueue.put(new PrintFileListEvent());
+						System.out.println("View: dodaje UpdateEvent");
+						blockingQueue.put(new UpdateEvent());
 					} catch (Exception ex)
 					{
 						ex.printStackTrace();
@@ -121,7 +121,7 @@ public class View
 			
 			
 			JButton button = new JButton("Select File");			
-			button.addActionListener(test2Listener);
+			button.addActionListener(updateButtonListener);
 			
 			button.setPreferredSize(new Dimension(40, 40));
 			add(button, BorderLayout.LINE_END);

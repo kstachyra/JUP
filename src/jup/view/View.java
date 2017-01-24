@@ -117,6 +117,7 @@ public class View
 			pack();
 			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			//setResizable(false);
+			setSize(1000, 400);
 			setVisible(true);	
 			
 			

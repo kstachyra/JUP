@@ -83,7 +83,6 @@ public class Model
 	 */
 	public void update()
 	{
-		System.out.println("Model.update: ...");
 		for (JupFile el : fileList)
 		{
 			if (el.getStatus() == FileStatus.NEW  || el.getStatus() == FileStatus.EDITED)

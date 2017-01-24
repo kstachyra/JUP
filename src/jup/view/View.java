@@ -62,7 +62,7 @@ public class View
 		
 		private JupFrame()
 		{
-			super("JComboBox Test");
+			super("JUP (KS)");
 			setLayout(new BorderLayout());
 			setLocationByPlatform(true);
 			

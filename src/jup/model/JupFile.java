@@ -20,13 +20,7 @@ public class JupFile
 		this.size = s;
 		this.status = FileStatus.NEW;
 		
-		try
-		{
-			this.checksum = Adler.calc(path, name);
-		} catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		updateChecksum();
 	}
 	
 	@Override
@@ -49,6 +43,17 @@ public class JupFile
 	{
         return Objects.hash(checksum, size, path, name);
     }
+	
+	public void updateChecksum()
+	{
+		try
+		{
+			this.checksum = Adler.calc(path, name);
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
 	
 	public Long getSize()
 	{

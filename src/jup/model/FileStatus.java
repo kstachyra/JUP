@@ -2,5 +2,5 @@ package jup.model;
 
 public enum FileStatus
 {
-	NEW, UPLOADED, UPLOADING;
+	NEW, UPLOADED, UPLOADING, EDITED;
 }

@@ -87,8 +87,8 @@ public class View
 				{
 					try
 					{
-						System.out.println("View: dodaje UpdateEvent");
-						blockingQueue.put(new UpdateEvent());
+						//System.out.println("View: dodaje UpdateEvent");
+						//blockingQueue.put(new UpdateEvent());
 					} catch (Exception ex)
 					{
 						ex.printStackTrace();

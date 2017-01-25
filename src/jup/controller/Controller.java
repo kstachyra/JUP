@@ -95,8 +95,9 @@ public class Controller
 	{
 		public void runStrategy(final JupEvent event)
 		{
+			UpdateEvent updateEvent = (UpdateEvent) event;
 			System.out.println("Controller.UpdateStrategy...");
-			model.update();
+			model.updateFileStatus(updateEvent.getPath(), updateEvent.getName(), updateEvent.getStatus());
 		}
 	}
 	

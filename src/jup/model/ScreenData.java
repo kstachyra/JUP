@@ -17,9 +17,9 @@ public class ScreenData
 	{
 		switch (status)
 		{
-		case JEDEN: return "pierwszy status";
-		case START: return "starting";
-		case LOADING: return "loading";
+		case CONNECT: return "connecting to server";
+		case WORK: return "ready";
+		case CLOSE: return "closing";
 			
 		default: return "error status";
 		}

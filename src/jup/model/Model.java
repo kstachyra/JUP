@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
+import javax.swing.JOptionPane;
+
 import jup.ftpModel.*;
 
 public class Model
@@ -24,7 +26,7 @@ public class Model
 	 */
 	public Model(FtpModel ftp)
 	{
-		status = JupStatus.START;
+		status = JupStatus.CONNECT;
 	    ftp.start();
 	    ftpQueue = ftp.ftpQueue;
 	    
@@ -36,6 +38,7 @@ public class Model
 			ex.printStackTrace();
 		}
 		//TODO run w¹tki, pobierz info o plikach, zmien status oswie¿ widok...
+	    loadFileList();
 	    //a jak nie to error koniec kaput
 	}
 
@@ -53,7 +56,7 @@ public class Model
 	 */
 	public void addFile(String path, String name)
 	{
-		System.out.println("Model.addFile: dodajê nowy plik do listy: " + path + "\\" + name);
+		boolean toUpload = false;
 		File file = new File(path, name);
 		
 		if (file.canRead())
@@ -62,39 +65,55 @@ public class Model
 			//gdy nie jest to dok³adnie ten sam plik
 			if (!fileList.contains(newFile))
 			{
-				//i nie istnieje taki o podanej œcie¿ce
-				if (findFile(path, name) == null)
+				JupFile ff = findFile(path, name);
+				//nie istnieje taki o podanej œcie¿ce
+				if (ff == null)
 				{
 					fileList.add(newFile);
+					toUpload = true;
 				}
-				//jest taka œcie¿ka, ale plik siê zmieni³
-				else
+				//jest taka œcie¿ka, ale plik siê zmieni³ i ju¿ jest zuploadowany
+				else if (ff.getStatus() == FileStatus.UPLOADED || ff.getStatus() == FileStatus.DOWNLOADED)
 				{
 					changeStatus(path, name, FileStatus.EDITED);
+					toUpload = true;
 				}
+				//jeœli w³aœnie jest u¿ywany
+				else if (ff.getStatus() == FileStatus.UPLOADING || ff.getStatus() == FileStatus.DOWNLOADING || ff.getStatus() == FileStatus.TO_DOWNLOAD)
+				{
+					JOptionPane.showMessageDialog(null, "ERROR file is being used\nOK to continue");
+				}
+				//w pozosta³ych przypadkach jest na liœcie ftp i mo¿na pobraæ nowy z dysku
 			}
 			else System.out.println("Model.addFile: plik istnieje, pomijam dodawanie");
 		}
 		else System.out.println("Model.addFile: brak mo¿liwoœci odczytu pliku");
+		
+		//jeœli powinieneœ go dodawaæ do kolejki ftp
+		if (toUpload)
+		{
+			//w obu przypadkach dodaj go do kolejki ftp
+			try
+			{
+				System.out.println("Model.addFile: wysy³am informacje do FTP o upload pliku");
+				ftpQueue.put(new FtpUploadEvent(path, name));
+			} catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
-	 * synchronizuje informacje miêdzy serwerem a klientem
+	 * uaktualnia status pliku zgodnie z informacjami od serwera
 	 */
-	public void update()
+	public void updateFileStatus(String path, String name, FileStatus status)
 	{
 		for (JupFile el : fileList)
 		{
-			if (el.getStatus() == FileStatus.NEW  || el.getStatus() == FileStatus.EDITED)
+			if (el.getPath() == path && el.getName() == name)
 			{
-				System.out.println("Model.update: dodajê do kolejki ftp ¿¹danie wys³ania pliku na serwer" + el.getName());
-				try
-				{
-					ftpQueue.put(new FtpUploadEvent(el.getName(), el.getPath()));
-				} catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
+				changeStatus(path, name, status);
 			}
 		}
 	}
@@ -105,6 +124,7 @@ public class Model
 	public void exit()
 	{
 		System.out.println("Model.exit: koñczê pracê");
+		saveFileList();
 		//TODO poczekaj na w¹tki...
 	}
 
@@ -113,14 +133,21 @@ public class Model
 	 */
 	public void downloadFile(String path, String name, String dir)
 	{
-		System.out.println("Model.downloadFile: wstawiam do kolejki FTP ¿¹danie pobrania " + name);
-		try
+		if (findFile(path, name).getStatus() == FileStatus.UPLOADED)
 		{
-			ftpQueue.put(new FtpConnectEvent());
-			changeStatus(path, name, FileStatus.DOWNLOADING);
-		} catch (InterruptedException e)
+			changeStatus(path, name, FileStatus.TO_DOWNLOAD);
+			System.out.println("Model.downloadFile: wstawiam do kolejki FTP ¿¹danie pobrania " + name);
+			try
+			{
+				ftpQueue.put(new FtpDownloadEvent(path, name));
+			} catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
 		{
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "ERROR file not uploaded\nOK to continue");
 		}
 	}
 
@@ -146,6 +173,21 @@ public class Model
 	{
 		System.out.println("Model.changeStatus: zmieniam status pliku na " + status);
 		findFile(path, name).setStatus(status);
+	}
+	
+	/**
+	 * pobiera informacje o plikach po starcie programu z dysku
+	 */
+	private void loadFileList()
+	{
+		//TODO
+	}
+	/**
+	 * zapisuje informacje o plikach przy zakonczeniu programu z dysku
+	 */
+	private void saveFileList()
+	{
+		//TODO
 	}
 	
 }

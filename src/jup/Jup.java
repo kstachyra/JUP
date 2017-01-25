@@ -19,7 +19,7 @@ public class Jup
 			final FtpModel ftp = new FtpModel(blockingQueue);
 			final Model model = new Model(ftp);
 			final View view = new View(blockingQueue, model.getScreenData());	
-			final Controller controller = new Controller(view, model, blockingQueue, ftp);
+			final Controller controller = new Controller(view, model, blockingQueue);
 			
 			controller.work();
 		}

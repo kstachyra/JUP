@@ -24,6 +24,9 @@ public class FtpModel implements Runnable
 	 * co robimy (jak¹ strategiê) w zale¿noœci od tego, jakie zdarzenie otrzymamy */
 	private final HashMap<Class<? extends FtpEvent>, EventStrategy> eventStrategyMap;
 	
+	/** flaga informuj¹ca o dzia³aniu programu */
+	private boolean running = true;
+	
 	public FtpModel (final BlockingQueue<JupEvent> controllerQueue)
 	{
 		this.controllerQueue = controllerQueue;
@@ -100,7 +103,8 @@ public class FtpModel implements Runnable
 			System.out.println("FTP.DisconnectStrategy...");
 
 			Thread.sleep(5000);
-
+			
+			running = false;
 		}
 	}
 	
@@ -121,7 +125,7 @@ public class FtpModel implements Runnable
 	@Override
 	public void run()
 	{	
-		while(true)
+		while(running)
 		{
 			try
 			{
@@ -138,7 +142,7 @@ public class FtpModel implements Runnable
 				throw new RuntimeException(e);
 			}
 		}
-	//TODO koñczenie            System.out.println("FTP: koñczê pracê w¹tku");
+	System.out.println("FTP: koñczê pracê w¹tku");
 	}
 	
 	public void start()

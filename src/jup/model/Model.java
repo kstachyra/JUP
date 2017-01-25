@@ -2,11 +2,8 @@ package jup.model;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +24,15 @@ public class Model
 	/** kolejka zdarzeñ ftp */
 	private BlockingQueue<FtpEvent> ftpQueue;
 	
+	private FtpModel ftp;
+	
 
 	/**
 	 * tworzenie modelu, uruchomienie w¹tków ftp, ustawienie statusu programu
 	 */
 	public Model(FtpModel ftp)
 	{
+		this.ftp = ftp;
 		status = JupStatus.CONNECT;
 	    ftp.start();
 	    ftpQueue = ftp.ftpQueue;
@@ -150,39 +150,70 @@ public class Model
 	}
 	
 	/**
+	 * dla wszystkich plików na liœcie sprawdza, czy zmieni³ siê
+	 * jeœli tak zmienia jego status i przekazuje do kolejki ftp
+	 */
+	public void checkEditions()
+	{
+		System.out.println("Model.checkEditions: sprawdzam zmiany...");
+		for (JupFile el : fileList)
+		{
+			JupFile newFile = new JupFile(el.getPath(), el.getName(), el.getSize());
+			if (!newFile.getChecksum().equals(el.getChecksum()))
+			{
+				System.out.println("Model.checkEditions: znaleziono zmianê");
+				el.setStatus(FileStatus.EDITED);
+				el.updateChecksum();
+				try
+				{
+					ftpQueue.put(new FtpUploadEvent(el.getPath(), el.getName()));
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		System.out.println("Model.checkEditions: OK!");
+	}
+
+	/**
 	 * koñczy pracê programu
 	 */
 	public void exit()
 	{
 		System.out.println("Model.exit: koñczê pracê");
 		saveFileList();
-		//TODO poczekaj na w¹tki...
+		try
+		{
+			ftpQueue.put(new FtpDisconnectEvent());
+			ftp.t1.join();
+		} catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+		System.exit(0);
 	}
 
 	/**
-	 * zwraca element listy plików pliku o podanej œcie¿ce
+	 * dla wszystkich plików z listy zleca upload dla potrzebuj¹cych
 	 */
-	private JupFile findFile(String path, String name)
+	private void fillFtpQueue()
 	{
 		for (JupFile el : fileList)
 		{
-			if (el.getName().equals(name) && el.getPath().equals(path))
+			if (el.getStatus() == FileStatus.NEW || el.getStatus() == FileStatus.EDITED)
 			{
-				return el;
+				try
+				{
+					ftpQueue.put(new FtpUploadEvent(el.getPath(), el.getName()));
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
-		return null;
 	}
-	
-	/**
-	 * zmienia status danego pliku (œcie¿ka + nazwa)
-	 */
-	private void changeStatus(String path, String name, FileStatus status)
-	{
-		System.out.println("Model.changeStatus: zmieniam status pliku na " + status);
-		findFile(path, name).setStatus(status);
-	}
-	
+
 	/**
 	 * pobiera informacje o plikach po starcie programu z dysku
 	 */
@@ -209,6 +240,7 @@ public class Model
 		}
 
 	}
+	
 	/**
 	 * zapisuje informacje o plikach przy zakonczeniu programu na dysku
 	 */
@@ -240,51 +272,28 @@ public class Model
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
-	 * dla wszystkich plików z listy zleca upload dla potrzebuj¹cych
+	 * zwraca element listy plików pliku o podanej œcie¿ce
 	 */
-	private void fillFtpQueue()
+	private JupFile findFile(String path, String name)
 	{
 		for (JupFile el : fileList)
 		{
-			if (el.getStatus() == FileStatus.NEW || el.getStatus() == FileStatus.EDITED)
+			if (el.getName().equals(name) && el.getPath().equals(path))
 			{
-				try
-				{
-					ftpQueue.put(new FtpUploadEvent(el.getPath(), el.getName()));
-				} catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
+				return el;
 			}
 		}
+		return null;
 	}
 
 	/**
-	 * dla wszystkich plików na liœcie sprawdza, czy zmieni³ siê
-	 * jeœli tak zmienia jego status i przekazuje do kolejki ftp
+	 * zmienia status danego pliku (œcie¿ka + nazwa)
 	 */
-	public void checkEditions()
+	private void changeStatus(String path, String name, FileStatus status)
 	{
-		System.out.println("Model.checkEditions: sprawdzam zmiany...");
-		for (JupFile el : fileList)
-		{
-			JupFile newFile = new JupFile(el.getPath(), el.getName(), el.getSize());
-			if (!newFile.getChecksum().equals(el.getChecksum()))
-			{
-				System.out.println("Model.checkEditions: znaleziono zmianê");
-				el.setStatus(FileStatus.EDITED);
-				el.updateChecksum();
-				try
-				{
-					ftpQueue.put(new FtpUploadEvent(el.getPath(), el.getName()));
-				} catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-		System.out.println("Model.checkEditions: OK!");
+		System.out.println("Model.changeStatus: zmieniam status pliku na " + status);
+		findFile(path, name).setStatus(status);
 	}
 }

@@ -12,8 +12,6 @@ import java.io.File;
 import java.util.concurrent.BlockingQueue;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import jup.event.*;
@@ -81,14 +79,13 @@ public class View
 			add(table, BorderLayout.CENTER);
 			//add(createInfoPanel(), BorderLayout.LINE_END);
 			
-			ActionListener updateButtonListener = new ActionListener()
+			ActionListener checkEditionsListener = new ActionListener()
 			{
 				public void actionPerformed(ActionEvent ae)
 				{
 					try
 					{
-						//System.out.println("View: dodaje UpdateEvent");
-						//blockingQueue.put(new UpdateEvent());
+						blockingQueue.put(new EditionsEvent());
 					} catch (Exception ex)
 					{
 						ex.printStackTrace();
@@ -121,8 +118,8 @@ public class View
 			setVisible(true);	
 			
 			
-			JButton button = new JButton("Select File");			
-			button.addActionListener(updateButtonListener);
+			JButton button = new JButton("?");			
+			button.addActionListener(checkEditionsListener);
 			
 			button.setPreferredSize(new Dimension(40, 40));
 			add(button, BorderLayout.LINE_END);
@@ -195,19 +192,6 @@ public class View
 			JMenuBar menuBar = new JMenuBar();
 			menuBar.add(fileMenu);
 			return menuBar;
-		}
-
-		private final JPanel createInfoPanel()
-		{
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		private final JToolBar createToolbar()
-		{
-			// TODO wyj¹æ przydatne opcje - opcjonalnie
-			JToolBar toolbar = new JToolBar();
-			return toolbar;
 		}
 		
 		private final JScrollPane createTable()

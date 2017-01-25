@@ -13,6 +13,9 @@ public class JupFile
 	private long checksum = 0L;
 	private FileStatus status;
 	
+	/**
+	 * konstruktor dla nowych plików
+	 */
 	JupFile(String p, String n, long s)
 	{
 		this.path = p;
@@ -21,6 +24,19 @@ public class JupFile
 		this.status = FileStatus.NEW;
 		
 		updateChecksum();
+	}
+	
+	/**
+	 * konstruktor dla zapamiêtanych plików
+	 */
+	JupFile(String p, String n, FileStatus stat, long c, long s)
+	{
+		this.path = p;
+		this.name = n;
+		this.checksum = c;
+		this.size = s;
+		
+		this.status = stat;
 	}
 	
 	@Override

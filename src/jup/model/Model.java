@@ -1,6 +1,13 @@
 package jup.model;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -37,9 +44,8 @@ public class Model
 		{
 			ex.printStackTrace();
 		}
-		//TODO run w¹tki, pobierz info o plikach, zmien status oswie¿ widok...
 	    loadFileList();
-	    //a jak nie to error koniec kaput
+	    fillFtpQueue();
 	}
 
 	/**
@@ -76,6 +82,7 @@ public class Model
 				else if (ff.getStatus() == FileStatus.UPLOADED || ff.getStatus() == FileStatus.DOWNLOADED)
 				{
 					changeStatus(path, name, FileStatus.EDITED);
+					ff.updateChecksum();
 					toUpload = true;
 				}
 				//jeœli w³aœnie jest u¿ywany
@@ -105,6 +112,29 @@ public class Model
 	}
 
 	/**
+	 * przekazuje do kolejki ftp zdarzenie pobrania pliku
+	 */
+	public void downloadFile(String path, String name, String dir)
+	{
+		if (findFile(path, name).getStatus() == FileStatus.UPLOADED || findFile(path, name).getStatus() == FileStatus.DOWNLOADED)
+		{
+			changeStatus(path, name, FileStatus.TO_DOWNLOAD);
+			System.out.println("Model.downloadFile: wstawiam do kolejki FTP ¿¹danie pobrania " + name);
+			try
+			{
+				ftpQueue.put(new FtpDownloadEvent(path, name));
+			} catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(null, "ERROR file not uploaded\nOK to continue");
+		}
+	}
+
+	/**
 	 * uaktualnia status pliku zgodnie z informacjami od serwera
 	 */
 	public void updateFileStatus(String path, String name, FileStatus status)
@@ -126,29 +156,6 @@ public class Model
 		System.out.println("Model.exit: koñczê pracê");
 		saveFileList();
 		//TODO poczekaj na w¹tki...
-	}
-
-	/**
-	 * przekazuje do kolejki ftp zdarzenie pobrania pliku
-	 */
-	public void downloadFile(String path, String name, String dir)
-	{
-		if (findFile(path, name).getStatus() == FileStatus.UPLOADED)
-		{
-			changeStatus(path, name, FileStatus.TO_DOWNLOAD);
-			System.out.println("Model.downloadFile: wstawiam do kolejki FTP ¿¹danie pobrania " + name);
-			try
-			{
-				ftpQueue.put(new FtpDownloadEvent(path, name));
-			} catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
-		}
-		else
-		{
-			JOptionPane.showMessageDialog(null, "ERROR file not uploaded\nOK to continue");
-		}
 	}
 
 	/**
@@ -181,13 +188,102 @@ public class Model
 	private void loadFileList()
 	{
 		//TODO
+		File fin = new File("JUPFileList.txt");
+		
+		try (BufferedReader br = new BufferedReader(new FileReader(fin)))
+		{
+		    String linePath, lineName, lineStatus, lineChecksum, lineSize;
+		    while ((linePath = br.readLine()) != null)
+		    {
+		    	lineName = br.readLine();
+		    	lineStatus = br.readLine();
+		    	lineChecksum = br.readLine();
+		    	lineSize = br.readLine();
+		    	
+		    	fileList.add(new JupFile(linePath, lineName, FileStatus.valueOf(lineStatus), Long.parseLong(lineChecksum), Long.parseLong(lineSize)));
+		    }
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
 	}
 	/**
-	 * zapisuje informacje o plikach przy zakonczeniu programu z dysku
+	 * zapisuje informacje o plikach przy zakonczeniu programu na dysku
 	 */
 	private void saveFileList()
 	{
-		//TODO
+		try
+		{
+		    PrintWriter writer = new PrintWriter("JUPFileList.txt");
+			for (JupFile el : fileList)
+			{
+				if (el.getStatus() == FileStatus.UPLOADING)
+				{
+					el.setStatus(FileStatus.NEW);
+				}
+				else if (el.getStatus() != FileStatus.EDITED && el.getStatus() != FileStatus.NEW)
+				{
+					el.setStatus(FileStatus.UPLOADED);
+				}
+				writer.println(el.getPath());
+				writer.println(el.getName());
+				writer.println(el.getStatus());
+				writer.println(el.getChecksum());
+				writer.println(el.getSize());
+			}
+		    
+		    writer.close();
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
+	/**
+	 * dla wszystkich plików z listy zleca upload dla potrzebuj¹cych
+	 */
+	private void fillFtpQueue()
+	{
+		for (JupFile el : fileList)
+		{
+			if (el.getStatus() == FileStatus.NEW || el.getStatus() == FileStatus.EDITED)
+			{
+				try
+				{
+					ftpQueue.put(new FtpUploadEvent(el.getPath(), el.getName()));
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/**
+	 * dla wszystkich plików na liœcie sprawdza, czy zmieni³ siê
+	 * jeœli tak zmienia jego status i przekazuje do kolejki ftp
+	 */
+	public void checkEditions()
+	{
+		System.out.println("Model.checkEditions: sprawdzam zmiany...");
+		for (JupFile el : fileList)
+		{
+			JupFile newFile = new JupFile(el.getPath(), el.getName(), el.getSize());
+			if (!newFile.getChecksum().equals(el.getChecksum()))
+			{
+				System.out.println("Model.checkEditions: znaleziono zmianê");
+				el.setStatus(FileStatus.EDITED);
+				el.updateChecksum();
+				try
+				{
+					ftpQueue.put(new FtpUploadEvent(el.getPath(), el.getName()));
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		System.out.println("Model.checkEditions: OK!");
+	}
 }

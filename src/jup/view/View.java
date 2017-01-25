@@ -241,6 +241,7 @@ public class View
 						} catch(Exception ex)
 						{
 							ex.printStackTrace();
+							//TODO tutaj b³êdy interfejsu!!!
 							throw new RuntimeException(ex);
 						}	
 			        }

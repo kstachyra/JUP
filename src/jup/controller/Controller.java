@@ -89,7 +89,7 @@ public class Controller
 	}
 	
 	/**
-	 * wyœwietlenie listy plików w konsoli
+	 * uaktualnianie informacji o plikach
 	 */
 	private final class UpdateStrategy extends EventStrategy
 	{
@@ -115,6 +115,18 @@ public class Controller
 	}
 	
 	/**
+	 * sprawdzanie czy pliki na liœcie zosta³ zedytowane
+	 */
+	private final class EditionsStrategy extends EventStrategy
+	{
+		public void runStrategy(final JupEvent evet)
+		{
+			System.out.println("Controller.EditionsStrategy");
+			model.checkEditions();
+		}
+	}
+	
+	/**
 	 * zape³nianie mapê strategii
 	 */
 	private void fillEventStrategyMap()
@@ -123,5 +135,6 @@ public class Controller
 		eventStrategyMap.put(UpdateEvent.class, new UpdateStrategy());
 		eventStrategyMap.put(DownloadFileEvent.class, new DownloadFileStrategy());
 		eventStrategyMap.put(ExitEvent.class, new ExitStrategy());
+		eventStrategyMap.put(EditionsEvent.class, new EditionsStrategy());
 	}
 }

@@ -133,8 +133,18 @@ public class FtpModel implements Runnable
 				EventStrategy eventStrategy = eventStrategyMap.get(event.getClass());
 				eventStrategy.runStrategy(event);
 				
-				//TODO odœwie¿ widok???
-				//controllerQueue.put(new UpdateEvent());
+				//jeœli w kolejcie jest zdarzenie roz³¹czenia
+				for (Object value : eventStrategyMap.values())
+				{
+					if (value instanceof DisconnectStrategy)
+					{
+						//to wyczyœæ resztê, wyjd¿ z pêtli iteruj¹cej i roz³¹cz
+						eventStrategyMap.clear();
+						DisconnectStrategy s = new DisconnectStrategy();
+						s.runStrategy(null);
+						break;
+					}
+				}
 			}
 			catch(Exception e)
 			{

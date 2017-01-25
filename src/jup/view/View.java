@@ -224,9 +224,9 @@ public class View
 							}
 						} catch(Exception ex)
 						{
-							ex.printStackTrace();
-							//TODO tutaj b³êdy interfejsu!!!
-							throw new RuntimeException(ex);
+							//ex.printStackTrace();
+							JOptionPane.showMessageDialog(null, "program is busy\ntry again");
+							//throw new RuntimeException(ex);
 						}	
 			        }
 			     }

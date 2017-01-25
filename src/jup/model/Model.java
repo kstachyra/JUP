@@ -130,7 +130,8 @@ public class Model
 		}
 		else
 		{
-			JOptionPane.showMessageDialog(null, "ERROR file not uploaded\nOK to continue");
+			if (findFile(path, name).getStatus() == FileStatus.TO_DOWNLOAD || findFile(path, name).getStatus() == FileStatus.DOWNLOADING) JOptionPane.showMessageDialog(null, "ERROR file is already downloading\nOK to continue");
+			else JOptionPane.showMessageDialog(null, "ERROR file not uploaded\nOK to continue");
 		}
 	}
 

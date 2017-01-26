@@ -15,6 +15,6 @@ UPLOADED
 856
 E:\down
 !plik drugi.txt
-NEW
+FTP_FAIL
 51759871
 98613

@@ -196,14 +196,17 @@ public class Model
 	 */
 	public void fileNotFound(String path, String name)
 	{
-		changeStatus(path,  name, FileStatus.NOT_FOUND_ONLINE);
-		try
+		if (findFile(path, name).getStatus() != FileStatus.ONLY_ONLINE)
 		{
-			JOptionPane.showMessageDialog(null, "ERROR file not found. Try to upload again\nOK to continue");
-			ftpQueue.put(new FtpUploadEvent(path, name));
-		} catch (InterruptedException e)
-		{
-			e.printStackTrace();
+			changeStatus(path,  name, FileStatus.NOT_FOUND_ONLINE);
+			try
+			{
+				JOptionPane.showMessageDialog(null, "ERROR file not found. Try to upload again\nOK to continue");
+				ftpQueue.put(new FtpUploadEvent(path, name));
+			} catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -256,7 +259,7 @@ public class Model
 					}
 				}
 			}
-			else
+			else if(el.getStatus() != FileStatus.FTP_FAIL)
 			{
 				el.setStatus(FileStatus.ONLY_ONLINE);
 				file.delete();
@@ -300,7 +303,11 @@ public class Model
 		    PrintWriter writer = new PrintWriter("JUPFileList.txt");
 			for (JupFile el : fileList)
 			{
-				if (el.getStatus() == FileStatus.UPLOADING || el.getStatus() == FileStatus.FTP_FAIL || el.getStatus()==FileStatus.ONLY_ONLINE)
+				if (el.getStatus() == FileStatus.FTP_FAIL)
+				{
+					System.out.println("Model.saveFileList: b³êdne wpisy, pomijam");
+				}
+				else if (el.getStatus() == FileStatus.UPLOADING || el.getStatus()==FileStatus.ONLY_ONLINE)
 				{
 					el.setStatus(FileStatus.NEW);
 				}

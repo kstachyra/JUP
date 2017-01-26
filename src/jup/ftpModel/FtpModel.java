@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
+
 import jup.event.ConnectedEvent;
 import jup.event.ConnectionErrorEvent;
 import jup.event.JupEvent;
+import jup.event.NotFound;
 import jup.event.UpdateEvent;
 import jup.model.FileStatus;
 
@@ -83,13 +86,19 @@ public class FtpModel implements Runnable
 
 			try
 			{
-				ftpClient.upload(e.getPath(), e.getName());
+				if (ftpClient.upload(e.getPath(), e.getName()))
+				{
+					controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.UPLOADED));
+				}
+				else
+				{
+					controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.INACCESSIBLE));
+				}
 			} catch (IOException e1)
 			{
 				e1.printStackTrace();
+				failFtp(e.getPath(), e.getName());
 			}
-			
-			controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.UPLOADED));
 		}
 	}
 	
@@ -107,12 +116,19 @@ public class FtpModel implements Runnable
 			
 			try
 			{
-				ftpClient.download(e.getPath(), e.getName(), e.getDir());
-				controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.DOWNLOADED));
-			} catch (IOException e1)
+				if (ftpClient.download(e.getPath(), e.getName(), e.getDir()))
+				{
+					controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.DOWNLOADED));
+				}
+				else
+				{
+					controllerQueue.put(new NotFound(e.getPath(), e.getName()));
+				}
+			} 
+			catch (IOException e1)
 			{
 				e1.printStackTrace();
-				controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.FTP_FAIL));
+				failFtp(e.getPath(), e.getName());
 			}
 		}
 	}
@@ -189,5 +205,12 @@ public class FtpModel implements Runnable
 	        t1 = new Thread (this);
 	        t1.start ();
 		}
+	}
+	
+	private void failFtp(String path, String name) throws InterruptedException
+	{
+		controllerQueue.put(new UpdateEvent(path, name, FileStatus.FTP_FAIL));
+		controllerQueue.put(new ConnectionErrorEvent());
+		running = false;
 	}
 }

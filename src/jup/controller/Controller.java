@@ -120,7 +120,7 @@ public class Controller
 	 */
 	private final class EditionsStrategy extends EventStrategy
 	{
-		public void runStrategy(final JupEvent evet)
+		public void runStrategy(final JupEvent event)
 		{
 			System.out.println("Controller.EditionsStrategy");
 			model.checkEditions();
@@ -132,7 +132,7 @@ public class Controller
 	 */
 	private final class ConnectedStrategy extends EventStrategy
 	{
-		public void runStrategy(final JupEvent evet)
+		public void runStrategy(final JupEvent event)
 		{
 			System.out.println("Controller.ConnectedStrategy");
 			model.setJupStatus(JupStatus.CONNECT);
@@ -144,10 +144,23 @@ public class Controller
 	 */
 	private final class ConnectionErrorStrategy extends EventStrategy
 	{
-		public void runStrategy(final JupEvent evet)
+		public void runStrategy(final JupEvent event)
 		{
 			System.out.println("Controller.ConnectionErrorStrategy");
 			model.connectionError();
+		}
+	}
+	
+	/**
+	 * nie znaleziono pliku na serwerze
+	 */
+	private final class NotFoundStrategy extends EventStrategy
+	{
+		public void runStrategy(final JupEvent event)
+		{
+			NotFound e = (NotFound) event;
+			System.out.println("Controller.NotFoundStrategy");
+			model.fileNotFound(e.getPath(), e.getName());
 		}
 	}
 	
@@ -163,6 +176,8 @@ public class Controller
 		eventStrategyMap.put(EditionsEvent.class, new EditionsStrategy());
 		eventStrategyMap.put(ConnectedEvent.class, new ConnectedStrategy());
 		eventStrategyMap.put(ConnectionErrorEvent.class, new ConnectionErrorStrategy());
+		eventStrategyMap.put(NotFound.class, new NotFoundStrategy());
+
 
 	}
 }

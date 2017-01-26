@@ -139,8 +139,14 @@ public class JupFtpClient
 		else
 		{
 			System.out.println("JupFtpClient.download: file download ERROR");
+			downloadFile.delete();
 		}
 		return success;
+	}
+	
+	boolean isConnected()
+	{
+		return ftpClient.isConnected();
 	}
 
 	/**

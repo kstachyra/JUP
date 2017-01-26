@@ -177,6 +177,31 @@ public class Model
 	}
 
 	/**
+	 * wyœwietla komunikat i wy³¹cza program
+	 */
+	public void connectionError()
+	{
+		JOptionPane.showMessageDialog(null, "server connection failed\nOK to quit");
+		exit();
+	}
+
+	/**
+	 * jeœli nie znaleziono pliku na serwerze, zmienia status i próbuje go wys³aæ ponownie
+	 */
+	public void fileNotFound(String path, String name)
+	{
+		changeStatus(path,  name, FileStatus.NOT_FOUND);
+		try
+		{
+			JOptionPane.showMessageDialog(null, "ERROR file not found. Try to upload again\nOK to continue");
+			ftpQueue.put(new FtpUploadEvent(path, name));
+		} catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * koñczy pracê programu
 	 */
 	public void exit()
@@ -260,7 +285,7 @@ public class Model
 		    PrintWriter writer = new PrintWriter("JUPFileList.txt");
 			for (JupFile el : fileList)
 			{
-				if (el.getStatus() == FileStatus.UPLOADING || el.getStatus() == FileStatus.FTP_FAIL)
+				if (el.getStatus() == FileStatus.UPLOADING || el.getStatus() == FileStatus.FTP_FAIL || el.getStatus()==FileStatus.INACCESSIBLE)
 				{
 					el.setStatus(FileStatus.NEW);
 				}
@@ -304,11 +329,5 @@ public class Model
 	{
 		System.out.println("Model.changeStatus: zmieniam status pliku na " + status);
 		findFile(path, name).setStatus(status);
-	}
-
-	public void connectionError()
-	{
-		JOptionPane.showMessageDialog(null, "unable to connect to server\nOK to quit");
-		exit();
 	}
 }

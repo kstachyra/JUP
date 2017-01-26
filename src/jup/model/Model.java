@@ -65,9 +65,9 @@ public class Model
 		boolean toUpload = false;
 		File file = new File(path, name);
 		
-		if (file.canRead())
+		if (file.canRead() && file.length()>0)
 		{
-			JupFile newFile = new JupFile(path, name, file.length());
+			JupFile newFile = new JupFile(path, name);
 			//gdy nie jest to dok³adnie ten sam plik
 			if (!fileList.contains(newFile))
 			{
@@ -158,7 +158,8 @@ public class Model
 		System.out.println("Model.checkEditions: sprawdzam zmiany...");
 		for (JupFile el : fileList)
 		{
-			JupFile newFile = new JupFile(el.getPath(), el.getName(), el.getSize());
+			JupFile newFile = new JupFile(el.getPath(), el.getName());
+			
 			if (!newFile.getChecksum().equals(el.getChecksum()))
 			{
 				System.out.println("Model.checkEditions: znaleziono zmianê");
@@ -172,6 +173,9 @@ public class Model
 					e.printStackTrace();
 				}
 			}
+			
+			
+			
 		}
 		System.out.println("Model.checkEditions: OK!");
 	}
@@ -236,15 +240,24 @@ public class Model
 	{
 		for (JupFile el : fileList)
 		{
-			if (el.getStatus() == FileStatus.NEW || el.getStatus() == FileStatus.EDITED)
+			File file = new File(el.getPath(), el.getName());
+			if (file.length()>0)
 			{
-				try
+				if (el.getStatus() == FileStatus.NEW || el.getStatus() == FileStatus.EDITED)
 				{
-					ftpQueue.put(new FtpUploadEvent(el.getPath(), el.getName()));
-				} catch (InterruptedException e)
-				{
-					e.printStackTrace();
+					try
+					{
+						ftpQueue.put(new FtpUploadEvent(el.getPath(), el.getName()));
+					} catch (InterruptedException e)
+					{
+						e.printStackTrace();
+					}
 				}
+			}
+			else
+			{
+				el.setStatus(FileStatus.INACCESSIBLE);
+				file.delete();
 			}
 		}
 	}
@@ -329,5 +342,23 @@ public class Model
 	{
 		System.out.println("Model.changeStatus: zmieniam status pliku na " + status);
 		findFile(path, name).setStatus(status);
+	}
+
+	/**
+	 * usuwa plik z listy
+	 */
+	public void deleteFile(String path, String name)
+	{
+		JupFile ff = findFile(path, name);
+		fileList.remove(ff);
+		
+		try
+		{
+			ftpQueue.put(new FtpDeleteEvent(path, name));
+		} catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

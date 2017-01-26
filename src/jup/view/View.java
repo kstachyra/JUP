@@ -145,7 +145,7 @@ public class View
 			//uzupe³niam o aktualne wiersze tabelê JTable
 			for (JupFile el : sd.tableData)
 			{
-				tableModel.addRow(new Object[]{el.getName(), el.getPath(), el.getStatus(), el.getChecksum(), el.getSize()});
+				tableModel.addRow(new Object[]{el.getName(), el.getPath(), el.getStatus(), el.getChecksum(), el.getSize(), "X"});
 			}
 		}
 		
@@ -207,28 +207,45 @@ public class View
 			    {
 			        if (evnt.getClickCount() == 1 && table.getSelectedRow() >= 0)
 			        {
-						try
-						{
-							// okno wyboru pliku
-							JFileChooser fileChooser = new JFileChooser();
-							fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-							int returnValue = fileChooser.showOpenDialog(null);
-							if (returnValue == JFileChooser.APPROVE_OPTION)
+			        	if (table.getSelectedColumn()!=5)
+			        	{
+							try
 							{
-								File selectedDir = fileChooser.getSelectedFile();
-								System.out.println("View: dodaje DownloadFileEvent " + selectedDir.getPath() + " dla " + table.getValueAt(table.getSelectedRow(), 0));
-								blockingQueue.put(new DownloadFileEvent(table.getValueAt(table.getSelectedRow(), 1).toString(), table.getValueAt(table.getSelectedRow(), 0).toString(), selectedDir.getPath()));
-							}
-							else
+								// okno wyboru pliku
+								JFileChooser fileChooser = new JFileChooser();
+								fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+								int returnValue = fileChooser.showOpenDialog(null);
+								if (returnValue == JFileChooser.APPROVE_OPTION)
+								{
+									File selectedDir = fileChooser.getSelectedFile();
+									System.out.println("View: dodaje DownloadFileEvent " + selectedDir.getPath() + " dla " + table.getValueAt(table.getSelectedRow(), 0));
+									blockingQueue.put(new DownloadFileEvent(table.getValueAt(table.getSelectedRow(), 1).toString(), table.getValueAt(table.getSelectedRow(), 0).toString(), selectedDir.getPath()));
+								}
+								else
+								{
+									System.out.println("View: b³¹d wybrania folderu zapisu, nie dodano eventu");
+								}
+							} catch(Exception ex)
 							{
-								System.out.println("View: b³¹d wybrania folderu zapisu, nie dodano eventu");
+								//ex.printStackTrace();
+								JOptionPane.showMessageDialog(null, "program is busy\ntry again");
+								//throw new RuntimeException(ex);
+							}	
+			        	}
+			        	
+			        	//przycisk usuwania
+			        	else if (table.getSelectedColumn()==5)
+			        	{
+							try
+							{
+								blockingQueue.put(new DeleteFileEvent(table.getValueAt(table.getSelectedRow(), 1).toString(), table.getValueAt(table.getSelectedRow(), 0).toString()));
+							} catch (InterruptedException e)
+							{
+								JOptionPane.showMessageDialog(null, "program is busy\ntry again");
+								//e.printStackTrace();
 							}
-						} catch(Exception ex)
-						{
-							//ex.printStackTrace();
-							JOptionPane.showMessageDialog(null, "program is busy\ntry again");
-							//throw new RuntimeException(ex);
-						}	
+
+			        	}
 			        }
 			     }
 			});

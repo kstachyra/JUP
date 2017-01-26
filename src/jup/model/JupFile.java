@@ -1,5 +1,6 @@
 package jup.model;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -8,19 +9,17 @@ public class JupFile
 	private final String path;
 	private final String name;
 
-	private final long size;
-	
+	private long size;
 	private long checksum = 0L;
 	private FileStatus status;
 	
 	/**
 	 * konstruktor dla nowych plików
 	 */
-	JupFile(String p, String n, long s)
+	JupFile(String p, String n)
 	{
 		this.path = p;
 		this.name = n;
-		this.size = s;
 		this.status = FileStatus.NEW;
 		
 		updateChecksum();
@@ -62,6 +61,7 @@ public class JupFile
 	
 	public void updateChecksum()
 	{
+		this.size = new File(path, name).length();
 		try
 		{
 			this.checksum = Adler.calc(path, name);

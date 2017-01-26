@@ -165,6 +165,19 @@ public class Controller
 	}
 	
 	/**
+	 * usuniêcie pliku z backupera
+	 */
+	private final class DeleteFileStrategy extends EventStrategy
+	{
+		public void runStrategy(final JupEvent event)
+		{
+			DeleteFileEvent e = (DeleteFileEvent) event;
+			System.out.println("Controller.DeleteFileStrategy");
+			model.deleteFile(e.getPath(), e.getName());
+		}
+	}
+	
+	/**
 	 * zape³nianie mapê strategii
 	 */
 	private void fillEventStrategyMap()
@@ -177,6 +190,7 @@ public class Controller
 		eventStrategyMap.put(ConnectedEvent.class, new ConnectedStrategy());
 		eventStrategyMap.put(ConnectionErrorEvent.class, new ConnectionErrorStrategy());
 		eventStrategyMap.put(NotFound.class, new NotFoundStrategy());
+		eventStrategyMap.put(DeleteFileEvent.class, new DeleteFileStrategy());
 
 
 	}

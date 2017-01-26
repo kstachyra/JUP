@@ -144,6 +144,33 @@ public class JupFtpClient
 		return success;
 	}
 	
+	/**
+	 * funkcja usuwaj¹ca plik na serverze
+	 */
+	void delete(String path, String name) throws IOException
+	{
+		ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+		
+		//jeœli separator w œcie¿kach jest typu windowsowego, zamieniam w œcie¿ce
+		if (File.separatorChar == '\\')
+		{
+			path = path.replace("\\", "/");
+		}
+		
+		ftpClient.changeWorkingDirectory("/");
+				
+		//wycinamy dwukropki...
+		path = decolon(path);
+		//plik pobierany z serwera
+		String remoteFile = path + "/" + name;		
+	
+		if( ftpClient.deleteFile(remoteFile)) System.out.println("JupFtpClient.delete: file deleted");
+		else System.out.println("JupFtpClient.delete: file deleted ERROR");
+	}
+	
+	/**
+	 * status po³¹czenia ftp
+	 */
 	boolean isConnected()
 	{
 		return ftpClient.isConnected();

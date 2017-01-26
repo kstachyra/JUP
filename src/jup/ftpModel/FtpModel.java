@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.commons.net.ftp.FTPConnectionClosedException;
-
 import jup.event.ConnectedEvent;
 import jup.event.ConnectionErrorEvent;
 import jup.event.JupEvent;
@@ -134,6 +132,28 @@ public class FtpModel implements Runnable
 	}
 	
 	/**
+	 * strategia dla usuwania pliku
+	 */
+	private class DeleteStrategy extends EventStrategy
+	{
+		@Override
+		public void runStrategy(FtpEvent event) throws InterruptedException
+		{
+			System.out.println("FTP.DeleteStrategy...");
+			FtpDeleteEvent e = (FtpDeleteEvent) event;
+			
+			try
+			{
+				ftpClient.delete(e.getPath(), e.getName());
+			} 
+			catch (IOException e1)
+			{
+				e1.printStackTrace();
+			}
+		}
+	}
+	
+	/**
 	 * strategia roz³¹czania 
 	 */
 	private class DisconnectStrategy extends EventStrategy
@@ -157,6 +177,8 @@ public class FtpModel implements Runnable
 		eventStrategyMap.put(FtpUploadEvent.class, new UploadStrategy());
 		eventStrategyMap.put(FtpDownloadEvent.class, new DownloadStrategy());
 		eventStrategyMap.put(FtpConnectEvent.class, new ConnectStrategy());
+		eventStrategyMap.put(FtpDeleteEvent.class, new DeleteStrategy());
+
 		eventStrategyMap.put(FtpDisconnectEvent.class, new DisconnectStrategy());
 	}
 	

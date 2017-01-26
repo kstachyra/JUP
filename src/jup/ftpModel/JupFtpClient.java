@@ -21,7 +21,10 @@ public class JupFtpClient
 	private final String server;
 	private final FTPClient ftpClient;
 
-
+	
+	/**
+	 * rozpoczyna pracê klienta ftp, ³¹czy siê z serwerem zgodnie z podanymi danymi
+	 */
 	public JupFtpClient(String user, String pass)
 	{
 		this.server = "127.0.0.1";
@@ -49,6 +52,9 @@ public class JupFtpClient
 		}
 	}
 	
+	/**
+	 * koñczy pracê klienta ftp
+	 */
 	void stop()
 	{
 		try
@@ -61,6 +67,9 @@ public class JupFtpClient
 		}
 	}
 
+	/**
+	 * wysy³a na serwer ftp plik z zachowaniem hierarchi katalogów
+	 */
 	boolean upload(String path, String name) throws IOException
 	{
 		ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
@@ -103,20 +112,18 @@ public class JupFtpClient
 			path = path.replace("\\", "/");
 		}
 				
-		System.out.println("POBIERAMY Z: " + path + "/" + name);
 		//wycinamy dwukropki...
 		path = decolon(path);
-		System.out.println("POBIERAMY Z: " + path + "/" + name);
 		//plik pobierany z serwera
-		String remoteFile1 = path + "/" + name;
+		String remoteFile = path + "/" + name;
 	
 		//plik do zapisu lokalnie
-		File downloadFile1 = new File(dir + "/" + name);
+		File downloadFile = new File(dir + "/" + name);
 		
-		
-		OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile1));
-		boolean success = ftpClient.retrieveFile(remoteFile1, outputStream1);
-		outputStream1.close();
+	
+		OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(downloadFile));
+		boolean success = ftpClient.retrieveFile(remoteFile, outputStream);
+		outputStream.close();
 	
 		if (success)
 		{
@@ -129,6 +136,9 @@ public class JupFtpClient
 		return success;
 	}
 
+	/**
+	 * roz³¹czanie klineta ftp z serwerem
+	 */
 	private void disconnect() throws IOException
 	{
 		if (ftpClient.isConnected())
@@ -138,6 +148,9 @@ public class JupFtpClient
 		}
 	}
 
+	/**
+	 * ³¹czenie siê klientaFtp z serwerem
+	 */
 	private void connect() throws SocketException, IOException
 	{
 		ftpClient.connect(server, port);
@@ -181,6 +194,9 @@ public class JupFtpClient
 		ftpClient.changeWorkingDirectory("/" + path);
 	}
 
+	/**
+	 * usuwa drugi znak ze Sringa (dwukropek oznaczaj¹cy literê dysku)
+	 */
 	private String decolon(String s)
 	{
 		return s.substring(0, 1) + s.substring(2);

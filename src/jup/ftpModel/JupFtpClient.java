@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketException;
+import java.util.Stack;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -60,29 +61,32 @@ public class JupFtpClient
 		}
 	}
 
-	void upload(String path, String name) throws IOException
+	boolean upload(String path, String name) throws IOException
 	{
+		ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+		//plik z dysku do uploadu
+		File firstLocalFile = new File(path + "/" + name);
+		
+		makeDirTree(path);
+
+		//plik tworzony (aktualizowany) po stronie serwera
+		String firstRemoteFile = name;
+
+		InputStream inputStream = new FileInputStream(firstLocalFile);
+
+		boolean done = ftpClient.storeFile(firstRemoteFile, inputStream);
+		inputStream.close();
+
+		if (done)
 		{
-			ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-	
-			File firstLocalFile = new File(path + "/" + name);
-	
-			String firstRemoteFile = name;
-			InputStream inputStream = new FileInputStream(firstLocalFile);
-	
-			System.out.println("Start uploading first file");
-			boolean done = ftpClient.storeFile(firstRemoteFile, inputStream);
-			inputStream.close();
-	
-			if (done)
-			{
-				System.out.println("JupFtpClient.upload: file upload successful");
-			}
-			else
-			{
-				System.out.println("JupFtpClient.upload: file upload ERROR");
-			}
+			System.out.println("JupFtpClient.upload: file upload successful");
 		}
+		else
+		{
+			System.out.println("JupFtpClient.upload: file upload ERROR");
+		}
+		return done;
 	}
 
 	/**
@@ -90,6 +94,8 @@ public class JupFtpClient
 	 */
 	boolean download(String path, String name, String dir) throws IOException
 	{
+		ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+		
 		//jeœli separator w œcie¿kach jest typu windowsowego, zamieniam w œcie¿ce
 		if (File.separatorChar == '\\')
 		{
@@ -97,12 +103,15 @@ public class JupFtpClient
 			path = path.replace("\\", "/");
 		}
 				
+		System.out.println("POBIERAMY Z: " + path + "/" + name);
+		//wycinamy dwukropki...
+		path = decolon(path);
+		System.out.println("POBIERAMY Z: " + path + "/" + name);
 		//plik pobierany z serwera
-		String remoteFile1 = "/" + name;
+		String remoteFile1 = path + "/" + name;
 	
 		//plik do zapisu lokalnie
 		File downloadFile1 = new File(dir + "/" + name);
-		
 		
 		
 		OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile1));
@@ -134,5 +143,46 @@ public class JupFtpClient
 		ftpClient.connect(server, port);
 		ftpClient.login(user, pass);
 		ftpClient.enterLocalPassiveMode();
+	}
+
+	/**
+	 * tworzy (jeœli nie istnieje) i zmienia roboczy katalog o zadanej œcie¿ce
+	 */
+	private void makeDirTree(String path) throws IOException
+	{
+		Stack <String> dirs = new Stack <String>();
+		File tempFile = new File(path);
+		
+		while (tempFile.getParent() != null)
+		{
+			dirs.push(tempFile.getPath());
+			tempFile = new File(tempFile.getParent());
+		}
+
+		dirs.push(tempFile.getPath());
+		
+		while (!dirs.empty())
+		{
+			String subdir;
+			subdir = dirs.pop();
+
+			//wycinamy dwukropki...
+			subdir = decolon(subdir);
+				
+			if (ftpClient.changeWorkingDirectory("/" + subdir) == false)
+			{
+				//punktem wyjœciowym dla tworzenia katalogów jest katalog g³ówny
+				ftpClient.changeWorkingDirectory("/");
+				//nie ma takiego folderu, wiêc twórz
+				ftpClient.makeDirectory(subdir);
+			}
+		}
+		path = decolon(path);
+		ftpClient.changeWorkingDirectory("/" + path);
+	}
+
+	private String decolon(String s)
+	{
+		return s.substring(0, 1) + s.substring(2);
 	}
 }

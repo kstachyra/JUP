@@ -21,8 +21,9 @@ public class JupFile
 		this.path = p;
 		this.name = n;
 		this.status = FileStatus.NEW;
-		
-		updateChecksum();
+		this.size = (new File(path, name).length())/(1024);
+		if (this.size == 0 ) this.checksum = 0;
+		else updateChecksum();
 	}
 	
 	/**
@@ -61,7 +62,6 @@ public class JupFile
 	
 	public void updateChecksum()
 	{
-		this.size = new File(path, name).length();
 		try
 		{
 			this.checksum = Adler.calc(path, name);

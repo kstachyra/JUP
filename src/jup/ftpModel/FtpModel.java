@@ -90,7 +90,7 @@ public class FtpModel implements Runnable
 				}
 				else
 				{
-					controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.INACCESSIBLE));
+					controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.ONLY_ONLINE));
 				}
 			} catch (IOException e1)
 			{

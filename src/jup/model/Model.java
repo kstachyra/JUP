@@ -116,7 +116,7 @@ public class Model
 	 */
 	public void downloadFile(String path, String name, String dir)
 	{
-		if (findFile(path, name).getStatus() == FileStatus.UPLOADED || findFile(path, name).getStatus() == FileStatus.DOWNLOADED)
+		if (findFile(path, name).getStatus() == FileStatus.UPLOADED || findFile(path, name).getStatus() == FileStatus.DOWNLOADED || findFile(path, name).getStatus() == FileStatus.ONLY_ONLINE)
 		{
 			changeStatus(path, name, FileStatus.TO_DOWNLOAD);
 			System.out.println("Model.downloadFile: wstawiam do kolejki FTP ¿¹danie pobrania " + name);
@@ -160,7 +160,12 @@ public class Model
 		{
 			JupFile newFile = new JupFile(el.getPath(), el.getName());
 			
-			if (!newFile.getChecksum().equals(el.getChecksum()))
+			if (newFile.getSize() == 0)
+			{
+				System.out.println("Model.checkEditions: plik nie istnieje");
+				el.setStatus(FileStatus.ONLY_ONLINE);
+			}
+			else if (!newFile.getChecksum().equals(el.getChecksum()))
 			{
 				System.out.println("Model.checkEditions: znaleziono zmianê");
 				el.setStatus(FileStatus.EDITED);
@@ -173,9 +178,6 @@ public class Model
 					e.printStackTrace();
 				}
 			}
-			
-			
-			
 		}
 		System.out.println("Model.checkEditions: OK!");
 	}
@@ -194,7 +196,7 @@ public class Model
 	 */
 	public void fileNotFound(String path, String name)
 	{
-		changeStatus(path,  name, FileStatus.NOT_FOUND);
+		changeStatus(path,  name, FileStatus.NOT_FOUND_ONLINE);
 		try
 		{
 			JOptionPane.showMessageDialog(null, "ERROR file not found. Try to upload again\nOK to continue");
@@ -256,7 +258,7 @@ public class Model
 			}
 			else
 			{
-				el.setStatus(FileStatus.INACCESSIBLE);
+				el.setStatus(FileStatus.ONLY_ONLINE);
 				file.delete();
 			}
 		}
@@ -298,7 +300,7 @@ public class Model
 		    PrintWriter writer = new PrintWriter("JUPFileList.txt");
 			for (JupFile el : fileList)
 			{
-				if (el.getStatus() == FileStatus.UPLOADING || el.getStatus() == FileStatus.FTP_FAIL || el.getStatus()==FileStatus.INACCESSIBLE)
+				if (el.getStatus() == FileStatus.UPLOADING || el.getStatus() == FileStatus.FTP_FAIL || el.getStatus()==FileStatus.ONLY_ONLINE)
 				{
 					el.setStatus(FileStatus.NEW);
 				}

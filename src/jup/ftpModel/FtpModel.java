@@ -1,5 +1,6 @@
 package jup.ftpModel;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -27,6 +28,9 @@ public class FtpModel implements Runnable
 	/** flaga informuj¹ca o dzia³aniu programu */
 	private boolean running = true;
 	
+	/** modu³ klientFtp */
+	private JupFtpClient ftpClient;
+	
 	public FtpModel (final BlockingQueue<JupEvent> controllerQueue)
 	{
 		this.controllerQueue = controllerQueue;
@@ -51,7 +55,8 @@ public class FtpModel implements Runnable
 		public void runStrategy(FtpEvent event) throws InterruptedException
 		{
 			System.out.println("FTP.ConnectStrategy...");
-			Thread.sleep(10000);
+			ftpClient = new JupFtpClient("jup", "jup");
+			//TODO program status connected
 		}
 	}
 	
@@ -67,7 +72,13 @@ public class FtpModel implements Runnable
 			FtpUploadEvent e = (FtpUploadEvent) event;
 			controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.UPLOADING));
 
-			Thread.sleep(10000);
+			try
+			{
+				ftpClient.upload1(e.getPath(), e.getName());
+			} catch (IOException e1)
+			{
+				e1.printStackTrace();
+			}
 			
 			controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.UPLOADED));
 		}
@@ -102,8 +113,8 @@ public class FtpModel implements Runnable
 		{
 			System.out.println("FTP.DisconnectStrategy...");
 
-			Thread.sleep(5000);
-			
+			ftpClient.stop();
+
 			running = false;
 		}
 	}
@@ -133,7 +144,8 @@ public class FtpModel implements Runnable
 				EventStrategy eventStrategy = eventStrategyMap.get(event.getClass());
 				eventStrategy.runStrategy(event);
 				
-				//jeœli w kolejcie jest zdarzenie roz³¹czenia
+				/* TODO nie dzia³a coœ
+				 //jeœli w kolejcie jest zdarzenie roz³¹czenia
 				for (Object value : eventStrategyMap.values())
 				{
 					if (value instanceof DisconnectStrategy)
@@ -144,7 +156,7 @@ public class FtpModel implements Runnable
 						s.runStrategy(null);
 						break;
 					}
-				}
+				}*/
 			}
 			catch(Exception e)
 			{

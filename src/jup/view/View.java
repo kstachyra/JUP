@@ -103,7 +103,7 @@ public class View
 					try
 					{
 						blockingQueue.put(new ExitEvent());
-						JOptionPane.showMessageDialog(frame, "background task are running\nforce quit?");
+						JOptionPane.showMessageDialog(frame, "background task running\nforce quit?");
 					} catch (Exception ex)
 					{
 						ex.printStackTrace();

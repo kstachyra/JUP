@@ -74,7 +74,7 @@ public class FtpModel implements Runnable
 
 			try
 			{
-				ftpClient.upload1(e.getPath(), e.getName());
+				ftpClient.upload(e.getPath(), e.getName());
 			} catch (IOException e1)
 			{
 				e1.printStackTrace();
@@ -96,7 +96,13 @@ public class FtpModel implements Runnable
 			FtpDownloadEvent e = (FtpDownloadEvent) event;
 			controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.DOWNLOADING));
 			
-			Thread.sleep(10000);
+			try
+			{
+				ftpClient.download(e.getPath(), e.getName(), e.getDir());
+			} catch (IOException e1)
+			{
+				e1.printStackTrace();
+			}
 			
 			controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.DOWNLOADED));
 
@@ -145,7 +151,7 @@ public class FtpModel implements Runnable
 				eventStrategy.runStrategy(event);
 				
 				/* TODO nie dzia³a coœ
-				 //jeœli w kolejcie jest zdarzenie roz³¹czenia
+				//jeœli w kolejcie jest zdarzenie roz³¹czenia
 				for (Object value : eventStrategyMap.values())
 				{
 					if (value instanceof DisconnectStrategy)

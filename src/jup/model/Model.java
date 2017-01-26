@@ -122,7 +122,7 @@ public class Model
 			System.out.println("Model.downloadFile: wstawiam do kolejki FTP ¿¹danie pobrania " + name);
 			try
 			{
-				ftpQueue.put(new FtpDownloadEvent(path, name));
+				ftpQueue.put(new FtpDownloadEvent(path, name, dir));
 			} catch (InterruptedException e)
 			{
 				e.printStackTrace();

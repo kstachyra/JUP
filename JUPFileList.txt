@@ -1,55 +1,15 @@
-C:\Users\KS\Documents\3ds Max 2010 Tutorials\export
-_biped_for_template.FBX
+C:\Users\KS\Documents
+avalon_instrukcja.pdf
 UPLOADED
-994486733
-628224
-C:\Users\KS\Documents\3ds Max 2010 Tutorials\export
-_bone_skeleton.FBX
-UPLOADED
-4174068852
-287888
-C:\Users\KS\Documents\3ds Max 2010 Tutorials\export
-_Pepe_biped-Bip01.FBX
-UPLOADED
-2390531632
-1520720
-C:\Users\KS\Documents\3ds Max 2010 Tutorials\export
-_Pepe_biped-PEPE.FBX
-UPLOADED
-3229304986
-1520400
-C:\Users\KS\Documents\3ds Max 2010 Tutorials\export
-Pepe_biped_characterized.FBX
-UPLOADED
-2372621170
-2104400
+1038854245
+2929165
 C:\Users\KS\Documents
 !plik1 — kopia.txt
 UPLOADED
 4181444927
-100979994
+100979998
 C:\Users\KS\Documents
 !plik1.txt
 UPLOADED
 1189726847
-100979994
-C:\Users\KS\Documents\3ds Max 2010 Tutorials\export
-_univ_bip_template.FBX
-UPLOADED
-3838362749
-135376
-C:\Users\KS\Documents\3ds Max 2010 Tutorials\import\Motionbuilder Files
-_Pepe_biped_plotted.FBX
-UPLOADED
-580496715
-7019824
-C:\Users\KS\Documents\3ds Max 2010 Tutorials\export
-IceSlip.fbx
-UPLOADED
-3754799654
-3937488
-C:\Users\KS\Documents\Biblioteka calibre\_376_377_000M_000a_000r_000i_000o\_376_377_000P_000a_000n_000 _000S_00 (5)
-cover.jpg
-UPLOADED
-3020249855
-382557
+100980008

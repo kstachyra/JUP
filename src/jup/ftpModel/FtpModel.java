@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import jup.event.ConnectedEvent;
+import jup.event.ConnectionErrorEvent;
 import jup.event.JupEvent;
 import jup.event.UpdateEvent;
 import jup.model.FileStatus;
@@ -55,8 +57,16 @@ public class FtpModel implements Runnable
 		public void runStrategy(FtpEvent event) throws InterruptedException
 		{
 			System.out.println("FTP.ConnectStrategy...");
-			ftpClient = new JupFtpClient("jup", "jup");
-			//TODO program status connected
+			
+			try
+			{
+				ftpClient = new JupFtpClient("jup", "jup");
+				controllerQueue.put(new ConnectedEvent());
+			} catch (Exception e)
+			{
+				System.out.println("AAAAAAAAAAA");
+				controllerQueue.put(new ConnectionErrorEvent());
+			}
 		}
 	}
 	

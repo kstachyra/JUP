@@ -3,6 +3,7 @@ package jup.controller;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 
+import jup.model.JupStatus;
 import jup.model.Model;
 import jup.view.View;
 import jup.event.*;
@@ -127,6 +128,30 @@ public class Controller
 	}
 	
 	/**
+	 * uaktualnienie stanu programu (po³¹czony)
+	 */
+	private final class ConnectedStrategy extends EventStrategy
+	{
+		public void runStrategy(final JupEvent evet)
+		{
+			System.out.println("Controller.ConnectedStrategy");
+			model.setJupStatus(JupStatus.CONNECT);
+		}
+	}
+	
+	/**
+	 * b³¹d po³¹czenia!
+	 */
+	private final class ConnectionErrorStrategy extends EventStrategy
+	{
+		public void runStrategy(final JupEvent evet)
+		{
+			System.out.println("Controller.ConnectionErrorStrategy");
+			model.connectionError();
+		}
+	}
+	
+	/**
 	 * zape³nianie mapê strategii
 	 */
 	private void fillEventStrategyMap()
@@ -136,5 +161,8 @@ public class Controller
 		eventStrategyMap.put(DownloadFileEvent.class, new DownloadFileStrategy());
 		eventStrategyMap.put(ExitEvent.class, new ExitStrategy());
 		eventStrategyMap.put(EditionsEvent.class, new EditionsStrategy());
+		eventStrategyMap.put(ConnectedEvent.class, new ConnectedStrategy());
+		eventStrategyMap.put(ConnectionErrorEvent.class, new ConnectionErrorStrategy());
+
 	}
 }

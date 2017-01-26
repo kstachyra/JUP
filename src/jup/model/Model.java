@@ -194,6 +194,16 @@ public class Model
 		System.exit(0);
 	}
 
+	public JupStatus getJupStatus()
+	{
+		return status;
+	}
+
+	public void setJupStatus(JupStatus status)
+	{
+		this.status = status;
+	}
+
 	/**
 	 * dla wszystkich plików z listy zleca upload dla potrzebuj¹cych
 	 */
@@ -219,7 +229,6 @@ public class Model
 	 */
 	private void loadFileList()
 	{
-		//TODO
 		File fin = new File("JUPFileList.txt");
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(fin)))
@@ -295,5 +304,11 @@ public class Model
 	{
 		System.out.println("Model.changeStatus: zmieniam status pliku na " + status);
 		findFile(path, name).setStatus(status);
+	}
+
+	public void connectionError()
+	{
+		JOptionPane.showMessageDialog(null, "unable to connect to server\nOK to quit");
+		exit();
 	}
 }

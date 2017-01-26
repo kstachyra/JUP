@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.SocketException;
 import java.util.Stack;
 
@@ -24,8 +25,10 @@ public class JupFtpClient
 	
 	/**
 	 * rozpoczyna pracê klienta ftp, ³¹czy siê z serwerem zgodnie z podanymi danymi
+	 * @throws ConnectException 
 	 */
-	public JupFtpClient(String user, String pass)
+	@SuppressWarnings("finally")
+	public JupFtpClient(String user, String pass) throws ConnectException
 	{
 		this.server = "127.0.0.1";
 		this.port = 21;
@@ -41,13 +44,16 @@ public class JupFtpClient
 		{
 			System.out.println("Error: " + ex.getMessage());
 			ex.printStackTrace();
-
+			System.out.println("BBBBBBBBBBBBBBBBBBBB");
 			try
 			{
 				disconnect();
 			} catch (IOException ex2)
 			{
 				ex.printStackTrace();
+			} finally
+			{
+				throw new ConnectException();
 			}
 		}
 	}

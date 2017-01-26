@@ -64,7 +64,6 @@ public class FtpModel implements Runnable
 				controllerQueue.put(new ConnectedEvent());
 			} catch (Exception e)
 			{
-				System.out.println("AAAAAAAAAAA");
 				controllerQueue.put(new ConnectionErrorEvent());
 			}
 		}
@@ -109,13 +108,12 @@ public class FtpModel implements Runnable
 			try
 			{
 				ftpClient.download(e.getPath(), e.getName(), e.getDir());
+				controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.DOWNLOADED));
 			} catch (IOException e1)
 			{
 				e1.printStackTrace();
+				controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.FTP_FAIL));
 			}
-			
-			controllerQueue.put(new UpdateEvent(e.getPath(), e.getName(), FileStatus.DOWNLOADED));
-
 		}
 	}
 	

@@ -260,7 +260,7 @@ public class Model
 		    PrintWriter writer = new PrintWriter("JUPFileList.txt");
 			for (JupFile el : fileList)
 			{
-				if (el.getStatus() == FileStatus.UPLOADING)
+				if (el.getStatus() == FileStatus.UPLOADING || el.getStatus() == FileStatus.FTP_FAIL)
 				{
 					el.setStatus(FileStatus.NEW);
 				}

@@ -44,7 +44,6 @@ public class JupFtpClient
 		{
 			System.out.println("Error: " + ex.getMessage());
 			ex.printStackTrace();
-			System.out.println("BBBBBBBBBBBBBBBBBBBB");
 			try
 			{
 				disconnect();
@@ -117,6 +116,8 @@ public class JupFtpClient
 			dir = dir.replace("\\", "/");
 			path = path.replace("\\", "/");
 		}
+		
+		ftpClient.changeWorkingDirectory("/");
 				
 		//wycinamy dwukropki...
 		path = decolon(path);

@@ -141,6 +141,8 @@ public class Model
 		}
 		else System.out.println("Model.addFile: brak mo¿liwoœci odczytu pliku");
 		
+		
+		
 		//jeœli powinieneœ go dodawaæ do kolejki ftp
 		if (toUpload)
 		{
@@ -161,7 +163,8 @@ public class Model
 	 */
 	public void downloadFile(String path, String name, String dir)
 	{
-		if (findFile(path, name).getStatus() == FileStatus.UPLOADED || findFile(path, name).getStatus() == FileStatus.DOWNLOADED || findFile(path, name).getStatus() == FileStatus.ONLY_ONLINE)
+		FileStatus status = findFile(path, name).getStatus();
+		if (status == FileStatus.UPLOADED || status == FileStatus.DOWNLOADED || status == FileStatus.ONLY_ONLINE)
 		{
 			changeStatus(path, name, FileStatus.TO_DOWNLOAD);
 			System.out.println("Model.downloadFile: wstawiam do kolejki FTP ¿¹danie pobrania " + name);
@@ -175,7 +178,7 @@ public class Model
 		}
 		else
 		{
-			if (findFile(path, name).getStatus() == FileStatus.TO_DOWNLOAD || findFile(path, name).getStatus() == FileStatus.DOWNLOADING) JOptionPane.showMessageDialog(null, "ERROR file is already downloading\nOK to continue");
+			if (status == FileStatus.TO_DOWNLOAD || status == FileStatus.DOWNLOADING) JOptionPane.showMessageDialog(null, "ERROR file is already downloading\nOK to continue");
 			else JOptionPane.showMessageDialog(null, "ERROR file not uploaded\nOK to continue");
 		}
 	}
@@ -303,10 +306,11 @@ public class Model
 	{
 		for (JupFile el : fileList)
 		{
+			FileStatus status = el.getStatus();
 			File file = new File(el.getPath(), el.getName());
 			if (file.length()>0)
 			{
-				if (el.getStatus() == FileStatus.NEW || el.getStatus() == FileStatus.EDITED)
+				if (status == FileStatus.NEW || status == FileStatus.EDITED)
 				{
 					try
 					{
@@ -317,7 +321,7 @@ public class Model
 					}
 				}
 			}
-			else if(el.getStatus() != FileStatus.FTP_FAIL)
+			else if(status != FileStatus.FTP_FAIL)
 			{
 				el.setStatus(FileStatus.ONLY_ONLINE);
 				file.delete();
@@ -361,15 +365,16 @@ public class Model
 		    PrintWriter writer = new PrintWriter("JUPFileList.txt");
 			for (JupFile el : fileList)
 			{
-				if (el.getStatus() == FileStatus.FTP_FAIL)
+				FileStatus status = el.getStatus();
+				if (status == FileStatus.FTP_FAIL)
 				{
 					System.out.println("Model.saveFileList: b³êdne wpisy, pomijam");
 				}
-				else if (el.getStatus() == FileStatus.UPLOADING || el.getStatus()==FileStatus.ONLY_ONLINE)
+				else if (status == FileStatus.UPLOADING || status == FileStatus.ONLY_ONLINE)
 				{
 					el.setStatus(FileStatus.NEW);
 				}
-				else if (el.getStatus() != FileStatus.EDITED && el.getStatus() != FileStatus.NEW)
+				else if (status != FileStatus.EDITED && status != FileStatus.NEW)
 				{
 					el.setStatus(FileStatus.UPLOADED);
 				}

@@ -1,20 +1,10 @@
 C:\Users\KS\Documents\!pliki JUP
-!plik1.txt
+!plik drugi.txt
 UPLOADED
-913950068
+226609471
 98613
 C:\Users\KS\Documents\!pliki JUP
-!plik drugi.txt
+avalon_instrukcja.pdf
 UPLOADED
-226609471
-98613
-E:\down
-!plik1.txt
-UPLOADED
-913950068
-98613
-C:\Users\KS\Documents
-!plik drugi.txt
-UPLOADED
-226609471
-98613
+1038854245
+2860

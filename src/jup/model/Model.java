@@ -43,6 +43,9 @@ public class Model
 		//start w¹tków
 	    ftp.start();
 	    scheduler.start();
+	    //ustawienie priorytetów
+	    ftp.t1.setPriority(Thread.MAX_PRIORITY/3 + Thread.MIN_PRIORITY);
+	    scheduler.t1.setPriority(Thread.MAX_PRIORITY/5 + Thread.MIN_PRIORITY);
 	    
 	    // START czytanie danych konfiguracyjnych
 		File fin = new File("JUPConfig.txt");
@@ -275,6 +278,9 @@ public class Model
 	public void exit()
 	{
 		System.out.println("Model.exit: koñczê pracê");
+		
+		//zapisuje dane te co s¹, gdyby u¿ytkownik wymusi³ zamkniêcie
+		saveFileList();
 		try
 		{
 			ftpQueue.put(new FtpDisconnectEvent());
@@ -284,6 +290,7 @@ public class Model
 		{
 			e.printStackTrace();
 		}
+		//zapisuje dane po skoñczeniu w¹tku serwera
 		saveFileList();
 
 		System.exit(0);

@@ -136,6 +136,23 @@ public class Model
 	}
 
 	/**
+	 * usuwa plik z listy
+	 */
+	public void deleteFile(String path, String name)
+	{
+		JupFile ff = findFile(path, name);
+		fileList.remove(ff);
+		
+		try
+		{
+			ftpQueue.put(new FtpDeleteEvent(path, name));
+		} catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * uaktualnia status pliku zgodnie z informacjami od serwera
 	 */
 	public void updateFileStatus(String path, String name, FileStatus status)
@@ -216,7 +233,6 @@ public class Model
 	public void exit()
 	{
 		System.out.println("Model.exit: koñczê pracê");
-		saveFileList();
 		try
 		{
 			ftpQueue.put(new FtpDisconnectEvent());
@@ -225,6 +241,8 @@ public class Model
 		{
 			e.printStackTrace();
 		}
+		saveFileList();
+
 		System.exit(0);
 	}
 
@@ -239,7 +257,7 @@ public class Model
 	}
 
 	/**
-	 * dla wszystkich plików z listy zleca upload dla potrzebuj¹cych
+	 * dla wszystkich plików z listy zleca upload dla NEW i EDITED
 	 */
 	private void fillFtpQueue()
 	{
@@ -351,23 +369,5 @@ public class Model
 	{
 		System.out.println("Model.changeStatus: zmieniam status pliku na " + status);
 		findFile(path, name).setStatus(status);
-	}
-
-	/**
-	 * usuwa plik z listy
-	 */
-	public void deleteFile(String path, String name)
-	{
-		JupFile ff = findFile(path, name);
-		fileList.remove(ff);
-		
-		try
-		{
-			ftpQueue.put(new FtpDeleteEvent(path, name));
-		} catch (InterruptedException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 }

@@ -3,7 +3,6 @@ package jup.controller;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 
-import jup.model.JupStatus;
 import jup.model.Model;
 import jup.view.View;
 import jup.event.*;
@@ -140,7 +139,6 @@ public class Controller
 		public void runStrategy(final JupEvent event)
 		{
 			System.out.println("Controller.ConnectedStrategy");
-			model.setJupStatus(JupStatus.CONNECT);
 		}
 	}
 	

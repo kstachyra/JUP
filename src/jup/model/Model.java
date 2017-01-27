@@ -18,9 +18,6 @@ public class Model
 {
 	/** lista wybranych plików */
 	private List <JupFile> fileList = new ArrayList<JupFile>();
-	
-	/** status programu */
-	private JupStatus status;
 		
 	/** kolejka zdarzeñ ftp */
 	private BlockingQueue<FtpEvent> ftpQueue;
@@ -34,7 +31,7 @@ public class Model
 	
 
 	/**
-	 * tworzenie modelu, uruchomienie w¹tków ftp, ustawienie statusu programu
+	 * tworzenie modelu, uruchomienie w¹tków ftp, czytanie pliku konfiguracyjnego, tworzenie schedulerów
 	 */
 	public Model(FtpModel ftp, final BlockingQueue<JupEvent> controllerQueue)
 	{
@@ -42,7 +39,6 @@ public class Model
 		ftpQueue = ftp.ftpQueue;
 				
 		scheduler = new Scheduler(controllerQueue);
-		status = JupStatus.CONNECT;
 		
 		//start w¹tków
 	    ftp.start();
@@ -99,7 +95,7 @@ public class Model
 	 */
 	public ScreenData getScreenData()
 	{
-		ScreenData sd = new ScreenData(fileList, status);
+		ScreenData sd = new ScreenData(fileList);
 		return sd;
 	}
 
@@ -292,17 +288,7 @@ public class Model
 
 		System.exit(0);
 	}
-
-	public JupStatus getJupStatus()
-	{
-		return status;
-	}
-
-	public void setJupStatus(JupStatus status)
-	{
-		this.status = status;
-	}
-
+	
 	/**
 	 * dla wszystkich plików z listy zleca upload dla NEW i EDITED
 	 */

@@ -31,6 +31,11 @@ public class Controller
 		fillEventStrategyMap();
 	}
 	
+	public BlockingQueue<JupEvent> getBq()
+	{
+		return bq;
+	}
+
 	/**
 	 * sterowanie kontrolera
 	 * pobiera zdarzenie z kolejki, sprawdza w mapie co robiæ, uruchamia odpowiedni¹ strategiê, odœwie¿a widok

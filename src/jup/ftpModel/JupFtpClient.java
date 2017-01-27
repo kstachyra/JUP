@@ -16,24 +16,22 @@ import org.apache.commons.net.ftp.FTPClient;
 
 public class JupFtpClient
 {
-	private final String user;
+	private final String server;
+	private final String login;
 	private final String pass;
 	private final int port;
-	private final String server;
 	private final FTPClient ftpClient;
 
-	
 	/**
 	 * rozpoczyna pracê klienta ftp, ³¹czy siê z serwerem zgodnie z podanymi danymi
-	 * @throws ConnectException 
 	 */
 	@SuppressWarnings("finally")
-	public JupFtpClient(String user, String pass) throws ConnectException
+	public JupFtpClient(String server, String user, String pass, int port) throws ConnectException
 	{
-		this.server = "127.0.0.1";
-		this.port = 21;
-		this.user = user;
+		this.server = server;
+		this.login = user;
 		this.pass = pass;
+		this.port = port;
 		this.ftpClient = new FTPClient();
 
 		try
@@ -194,7 +192,7 @@ public class JupFtpClient
 	private void connect() throws SocketException, IOException
 	{
 		ftpClient.connect(server, port);
-		ftpClient.login(user, pass);
+		ftpClient.login(login, pass);
 		ftpClient.enterLocalPassiveMode();
 	}
 

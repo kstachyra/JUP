@@ -11,6 +11,7 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.swing.JOptionPane;
 
+import jup.event.JupEvent;
 import jup.ftpModel.*;
 
 public class Model
@@ -20,26 +21,71 @@ public class Model
 	
 	/** status programu */
 	private JupStatus status;
-	
+		
 	/** kolejka zdarzeñ ftp */
 	private BlockingQueue<FtpEvent> ftpQueue;
 	
+	/** modu³ obs³ugi œcieciowej */
 	private FtpModel ftp;
+	
+	/** scheduler (powo³ywany oddzielny w¹tek) */
+	private Scheduler scheduler;
+	
 	
 
 	/**
 	 * tworzenie modelu, uruchomienie w¹tków ftp, ustawienie statusu programu
 	 */
-	public Model(FtpModel ftp)
+	public Model(FtpModel ftp, final BlockingQueue<JupEvent> controllerQueue)
 	{
 		this.ftp = ftp;
+		ftpQueue = ftp.ftpQueue;
+				
+		scheduler = new Scheduler(controllerQueue);
 		status = JupStatus.CONNECT;
+		
+		//start w¹tków
 	    ftp.start();
-	    ftpQueue = ftp.ftpQueue;
+	    scheduler.start();
+	    
+	    // START czytanie danych konfiguracyjnych
+		File fin = new File("JUPConfig.txt");
+		
+		//domyœlne wartoœci, gdy plik pusty TODO
+		String server = null;
+		String login = null;
+		String pass = null;
+		int port = 0;
+		int time = 5000;
+		
+		try (BufferedReader br = new BufferedReader(new FileReader(fin)))
+		{
+			String line;
+		    for (int i = 0; i<5; ++i)
+		    {
+		    	line = br.readLine();
+		    	String[] field = line.split(" ");
+		    	System.out.println("Model.Model: " + field[0] + " ustawiam -> " + field[1]);
+		    	
+		    	switch (i)
+		    	{
+		    	case 0: time = Integer.parseInt(field[1]); break;
+		    	case 1: server = field[1]; break;
+		    	case 2: login = field[1]; break;
+		    	case 3: pass = field[1]; break;
+		    	case 4: port = Integer.parseInt(field[1]);
+		    	}
+		    }
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		} // END
+		
+		scheduler.setTime(time);
 	    
 	    try
 		{
-			ftpQueue.put(new FtpConnectEvent());
+			ftpQueue.put(new FtpConnectEvent(server, login, pass, port));
 		} catch (Exception ex)
 		{
 			ex.printStackTrace();
@@ -236,6 +282,7 @@ public class Model
 		try
 		{
 			ftpQueue.put(new FtpDisconnectEvent());
+			scheduler.t1.interrupt();
 			ftp.t1.join();
 		} catch (InterruptedException e)
 		{

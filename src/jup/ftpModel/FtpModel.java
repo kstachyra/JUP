@@ -58,10 +58,12 @@ public class FtpModel implements Runnable
 		public void runStrategy(FtpEvent event) throws InterruptedException
 		{
 			System.out.println("FTP.ConnectStrategy...");
+			FtpConnectEvent ftpConnectEvent = (FtpConnectEvent) event;
+
 			
 			try
 			{
-				ftpClient = new JupFtpClient("jup", "jup");
+				ftpClient = new JupFtpClient(ftpConnectEvent.getServer(), ftpConnectEvent.getLogin(), ftpConnectEvent.getPass(), ftpConnectEvent.getPort());
 				controllerQueue.put(new ConnectedEvent());
 			} catch (Exception e)
 			{
